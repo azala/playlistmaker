@@ -7,7 +7,7 @@ def fileIsNewAndExists(fn, n):
     try:
         return fileIsNew(fn, n)
     except:
-        print('File couldn\'t be evaluated:')
+        print 'File couldn\'t be evaluated:'
         tryPrint(fn, '  ')
         plv.orphans.append(fn)
         return False
@@ -48,7 +48,7 @@ def checkIfFilesExist(l):
             plv.orphans.append(fn)
             found = True
     if not found:
-        print('No problems with dirfill.')
+        print 'No problems with dirfill.'
 
 def invalidate(t = None):
     if t == None:
@@ -56,9 +56,9 @@ def invalidate(t = None):
             return
         plv.invalidateAllTags = True
         plv.invalidateTheseTags = []
-        print('Invalidated all tags.')
+        print'Invalidated all tags.'
     elif t not in plv.invalidateTheseTags and not plv.invalidateAllTags:
-        print('Invalidated tag: '+t)
+        print'Invalidated tag: '+t
         plv.invalidateTheseTags.append(t)
 
 def revalidate():
@@ -73,11 +73,11 @@ def applyOrphans():
     if plv.orphans == []:
         pass
     else:
-        print('Removed data for orphans.')
+        print 'Removed data for orphans.'
     plv.orphans = []
 
 def removeFileFromDirfill(fn):
-    plv.dirFillLines = list(filter(lambda x: x[0] != fn, plv.dirFillLines))
+    plv.dirFillLines = filter(lambda x: x[0] != fn, plv.dirFillLines)
     plv.needRewriteDirfill = True
 
 def rewriteDirfillIfNeeded():
@@ -87,28 +87,28 @@ def rewriteDirfillIfNeeded():
             df.write(l.encode('utf-8'))
         df.close()
         plv.needRewriteDirfill = False
-        print('Applied orphans to dirfill.txt.')
+        print 'Applied orphans to dirfill.txt.'
 
 def readRatingData():
     for l in clean(fread(plv.ratingFile)):
         k, v = l.split('\t')
         plv.ratingdata[k] = int(v)
-    print('Loaded rating data.')
+    print 'Loaded rating data.'
     
 #---FILE MOVE
         
 def moveFile(src, dst, banish = False):
     if src == dst:
-        print('Failed, both names are the same.')
+        print 'Failed, both names are the same.'
         return
     for e in plv.move_file_queue:
         if e[2] == dst:
-            print('Failed, another file is going to move there.')
+            print 'Failed, another file is going to move there.'
             return
     try:
         subprocess.check_call(['move', src, dst], shell=True)
     except (subprocess.CalledProcessError, WindowsError) as e:
-        print('Move failed: '+str(e))
+        print 'Move failed: '+str(e)
         return
     #sort key update
     srcKey = plv.fileNames2sortKeys[src]
@@ -143,13 +143,13 @@ def moveFile(src, dst, banish = False):
         for i, item in enumerate(plv.move_file_queue):
             if item[2] == src:
                 replacedDst = True
-                print('Replaced a previous move action.')
+                print 'Replaced a previous move action.'
                 plv.move_file_queue[i][2] = dst
                 plv.move_file_queue[i][3] = dstKey
                 break
         if not replacedDst:
             plv.move_file_queue.append([src, srcKey, dst, dstKey])
-            print('Moved "'+src.rpartition('\\')[2]+'" to "'+dst.rpartition('\\')[2]+'".')
+            print 'Moved "'+src.rpartition('\\')[2]+'" to "'+dst.rpartition('\\')[2]+'".'
 
 def applyMoveFileQueue():
     replaceDirFillEntry(plv.move_file_queue)
@@ -194,14 +194,14 @@ def traverseCmd(s, parity):
         else:
             s = int(s)
         if traverse(parity*s):
-            print('Moved '+ba_string+' '+str(s)+' searches.')
+            print 'Moved '+ba_string+' '+str(s)+' searches.'
             plv.directorySearch = plv.resultHistory_DSFlag[plv.rptr]
             #plv.nosort = plv.resultHistory_NoSortFlag[rptr]
             printResults(readRes())
         else:
-            print('Couldn\'t move '+ba_string+' '+str(s)+' searches.')
+            print 'Couldn\'t move '+ba_string+' '+str(s)+' searches.'
     except:
-        print('Bad argument.')
+        print 'Bad argument.'
 
 def writeRes(x):
     plv.resultHistory[plv.rptr] = x
@@ -218,24 +218,24 @@ def showSearchList():
             pref = "> "
         else:
             pref = "  "
-        print(pref + str(len(plv.resultHistory[i])))
+        print pref + str(len(plv.resultHistory[i]))
         
 def getAlias(k, boo = True):
     if k in plv.tag_aliases:
         if boo:
-            print('Using alias "'+plv.tag_aliases[k]+'".')
+            print 'Using alias "'+plv.tag_aliases[k]+'".'
         return plv.tag_aliases[k]
     else:
         return k
         
 def defaultListFilter(l):
-    return list(filter(lambda x: x != '', map(lambda x: x.strip().decode('utf-8'), l)))
+    return filter(lambda x: x != '', map(lambda x: x.strip().decode('utf-8'), l))
         
 def fillTagAliases():
     inf = open(plv.tag_aliasfile, 'rb')
     aliasLines = defaultListFilter(inf.readlines())
     inf.close()
-    aliasLines = list(map(lambda x: x.split('\t'), aliasLines))
+    aliasLines = map(lambda x: x.split('\t'), aliasLines)
     for line in aliasLines:
         for k in line[1:]:
             plv.tag_aliases[k] = line[0]
@@ -260,34 +260,34 @@ def doBackup(buf = ['']):
     try:
         params = parseCmd(buf)
     except:
-        print('Invalid input.')
+        print 'Invalid input.'
     doE = '-doe' in params
     filelist = list(filter(lambda x: x.endswith('.txt'), os.listdir(plv.CDATAPATH)))
     curTime = dateTimeStr(time.gmtime())
     fdir = opj(mainBackupDir(), curTime)
-    print('Creating backup in: '+fdir)
+    print 'Creating backup in: '+fdir
     os.mkdir(fdir)
     for fn in filelist:
         shutil.copy(opj(plv.CDATAPATH, fn), opj(fdir, fn))
-        print('Backed up: '+fn)
+        print 'Backed up: '+fn
     #backup the search log also to a separate dir
     if backup(src=plv.cmdLogFile, bkdirpath=opj(plv.CDATAPATH, 'searchlogs'), oneDir=True):
         tmp = 'created'
     else:
         tmp = 'failed'
-    print('Search log backup '+tmp+'.')
+    print 'Search log backup '+tmp+'.'
     #
     for otherDir in plv.BACKUPDIRS[1:]:
         if plv.ROOTDIR in otherDir:
             if doE:
-                print('Creating '+plv.ROOTDIR+' backup...')
+                print 'Creating '+plv.ROOTDIR+' backup...'
             else:
-                print('Skipping '+plv.ROOTDIR+' backup.')
+                print 'Skipping '+plv.ROOTDIR+' backup.'
                 continue
         dstDir = opj(otherDir, curTime)
         shutil.copytree(fdir, dstDir)
-        print('Copied backups to: '+dstDir)
-    print('Done.')
+        print 'Copied backups to: '+dstDir
+    print 'Done.'
 
 def readDirs():
     plv.dirlist = clean(fread(plv.albumfile))
@@ -303,7 +303,7 @@ def readtags():
     for i in range(len(rawtfLines)-1, -1, -1):
         l = rawtfLines[i][:]
         if l[0] not in plv.lines: #if a filename from tagfile is not in dirfill
-            print('Filename not in directory?! (bug)')
+            print 'Filename not in directory?! (bug)'
             for t in l[1:]:
                 invalidateTheseLater.append(t)
             tryPrint(l[0],'  ')
@@ -311,24 +311,24 @@ def readtags():
             ctr += 1
             tfLines.append(l)
             invalidate()
-            print('Duplicate filename:')
+            print 'Duplicate filename:'
             tryPrint(l[0],'  ')
         else:
             ctr += 1
             tfLines.append(l)
             knownFileNames.append(l[0])
-    print('Imported '+str(ctr)+' tagged files.')
+    print 'Imported '+str(ctr)+' tagged files.'
     tf.close()
     plv.ptag_index, tag_index = getPriorityTags()
     plv.plkeys = plv.ptag_index + tag_index
     if plv.plkeys == []:
-        print('Blank tag index file.')
-        print('Generating new playlist order.')
+        print 'Blank tag index file.'
+        print 'Generating new playlist order.'
     for l in tfLines:
         for v in l[1:]:
             w = getAlias(v, False)
             if v != w:
-                print('Converting alias "'+v+'" to "'+w+'".')
+                print 'Converting alias "'+v+'" to "'+w+'".'
                 invalidate()
             v = w
             v = v.lower()
@@ -346,16 +346,16 @@ def readtags():
                 plv.taglists[l[0]] = [v]
     for t in invalidateTheseLater:
         invalidate(t)
-    print('Read tags & playlists.')
+    print 'Read tags & playlists.'
 
 #stuff you might search for:
 #doWrite, writeout
 def writetags():
     if nothingToDo():
-        print('Nothing was done. No need to save.')
+        print 'Nothing was done. No need to save.'
         return
     if not os.path.exists(plv.ROOTDIR):
-        print('iPod missing ('+plv.ROOTDIR+').')
+        print 'iPod missing ('+plv.ROOTDIR+').'
         return
     #----remove orphans
     applyOrphans()
@@ -391,7 +391,7 @@ def writetags():
         pf = open(os.path.join(plv.ROOTDIR, '[%02d]'%gpl_ctr + v + '.m3u8'), 'wb')
         plv.playlists[v].sort(key=lambda x: plv.fileNames2sortKeys[x])
         ctr += 1
-        print('Writing: ('+str(ctr)+'/'+str(lenplkeys)+') '+v)
+        print 'Writing: ('+str(ctr)+'/'+str(lenplkeys)+') '+v
         for k in plv.playlists[v]:
             pf.write((k.replace(plv.ROOTDIR, '/').replace('\\','/')+'\r\n').encode('utf-8'))
         pf.close()
@@ -399,9 +399,9 @@ def writetags():
     #write rating data
     if plv.ratingdataChanged:
         fwrite(unclean([k+'\t'+str(plv.ratingdata[k]) for k in plv.ratingdata]), plv.ratingFile)
-        print('Wrote rating data.')
+        print 'Wrote rating data.'
     plv.ratingdataChanged = False
-    print('Done writing.')
+    print 'Done writing.'
     revalidate()
 
 def isTheCommand(x, cmdShortString, lbuf = [None]):
@@ -423,7 +423,7 @@ def doTheCommand(x, cmdShortString, lbuf = [None]):
     if b:
         s = plv.FUNC_PREFIX+cmdShortString
         if s not in globals():
-            print('Failed command?')
+            print 'Failed command?'
         else:
             globals()[s](lbuf)
     return b
@@ -435,10 +435,10 @@ def cmd_tag(buf):
     plv.lastCmdWasSearch = False
     t = getAlias(buf[0].lower())
     if '"' in t or "'" in t:
-        print('Bad tag name.')
+        print 'Bad tag name.'
         return
     plv.lastTag = t
-    print('Applying tag: '+t)
+    print 'Applying tag: '+t
     rr = readRes()
     invalidatedAlready = False
     ctr = 0
@@ -461,16 +461,16 @@ def cmd_tag(buf):
                 plv.taglists[r] += [t]
         else:
             plv.taglists[r] = [t]
-    print('Applied tag to '+str(ctr)+' items.')
+    print 'Applied tag to '+str(ctr)+' items.'
 
 def cmd_same(buf):
     if plv.lastTag != None:
         cmd_tag([plv.lastTag])
     else:
-        print('No previous tag to duplicate.')
+        print 'No previous tag to duplicate.'
 
 def cmd_log(buf):
-    print('Saving & opening log file.')
+    print 'Saving & opening log file.'
     saveLog()
     os.popen(plv.notepad+' '+plv.cmdLogFile)
 
@@ -483,14 +483,14 @@ def cmd_kill(buf):
 def cmd_ds(buf):
     if buf[0] != '':
         plv.directorySearch = True
-        print('Directory search flag ON.')
+        print 'Directory search flag ON.'
         addMacro(buf[0])
         plv.continueFlag = True
         return
     elif plv.directorySearch:
-        print('Directory search flag OFF.')
+        print 'Directory search flag OFF.'
     else:
-        print('Directory search flag ON.')
+        print 'Directory search flag ON.'
     plv.directorySearch = not plv.directorySearch
 
 def cmd_pp(buf):
@@ -510,41 +510,41 @@ def cmd_p(buf):
             else:
                 num = int(buf[0])-1
     except:
-        print('Invalid selection.')
+        print 'Invalid selection.'
         plv.continueFlag = True
         return
     if playAll and plv.lenrr > 0 and not plv.directorySearch:
         if playFiles(plv.rr, not nosortFlag):
-            print('Playing files.')
+            print 'Playing files.'
         else:
-            print('Could not play files.')    
+            print 'Could not play files.'
     elif num < plv.lenrr and num >= 0:
         if plv.directorySearch:
             addMacro('/ds;"'+plv.rr[num]+'";/p --nosort')
             plv.continueFlag = True
             return
         if playFile(plv.rr[num], not nosortFlag):
-            print('Playing file '+plv.rr[num])
+            print 'Playing file '+plv.rr[num]
         else:
-            print('Could not play file.')
+            print 'Could not play file.'
     else:
-        print('Invalid selection.')
+        print 'Invalid selection.'
 
 def cmd_dates(buf):
     if plv.lenrr == 0:
-        print('Nothing in selection.')
+        print 'Nothing in selection.'
     ctr = 1
     for r in plv.rr:
         if r in plv.fileNames2Dates:
             s = dateTimeStr(plv.fileNames2Dates[r])
         else:
             s = ''
-        print(bracketNum(ctr) + s)
+        print bracketNum(ctr) + s
         ctr += 1
 
 def cmd_dir(buf):
     if plv.lenrr < 1:
-        print('Need a file selected.')
+        print 'Need a file selected.'
         plv.continueFlag = True
         return
     n = -1
@@ -553,23 +553,23 @@ def cmd_dir(buf):
     except:
         pass
     if n < 0 or n > plv.lenrr-1:
-        print('Bad index: '+buf[0]+'\r\nDefaulting to first element.')
+        print 'Bad index: '+buf[0]+'\r\nDefaulting to first element.'
         n = 0
     if plv.directorySearch:
         os.system('explorer "'+plv.rr[n]+'"')
-        print('Showing directory.')
+        print 'Showing directory.'
     else:
         os.system('explorer "'+plv.rr[n].rpartition('\\')[0]+'"')
-        print('Showing parent directory.')
+        print 'Showing parent directory.'
 
 def cmd_rn(buf):
     tags = parseCmd(buf[0])
     if len(tags) != 2:
-        print('Invalid rename operation (need two tag names).')
+        print 'Invalid rename operation (need two tag names).'
     elif tags[0] not in plv.playlists:
-        print('Tag doesn\'t exist.')
+        print 'Tag doesn\'t exist.'
     elif tags[1] in plv.playlists:
-        print('Target tag already exists.')
+        print 'Target tag already exists.'
     else:
         plv.didAnything = True
         invalidate()
@@ -582,16 +582,16 @@ def cmd_rn(buf):
         for i in range(0, len(plv.plkeys)):
             if plv.plkeys[i] == tags[0]:
                 plv.plkeys[i] = tags[1]
-        print('Renamed tag.')
+        print 'Renamed tag.'
 
 def cmd_move(buf):
     if plv.lenrr != 1:
-        print('You need exactly 1 element in the results list to move.')
+        print 'You need exactly 1 element in the results list to move.'
         plv.continueFlag = True
         return
     shortDst = parseCmd(buf[0])
     if len(shortDst) != 1:
-        print('You need exactly 1 argument (destination file) to move.')
+        print 'You need exactly 1 argument (destination file) to move.'
         plv.continueFlag = True
         return
     src = plv.rr[0]
@@ -602,12 +602,12 @@ def cmd_move(buf):
 
 def cmd_fmove(buf):
     if plv.lenrr != 1:
-        print('You need exactly 1 element in the results list to move.')
+        print 'You need exactly 1 element in the results list to move.'
         plv.continueFlag = True
         return
     shortDst = parseCmd(buf[0])
     if len(shortDst) != 1:
-        print('You need exactly 1 argument (destination directory) to move.')
+        print 'You need exactly 1 argument (destination directory) to move.'
         plv.continueFlag = True
         return
     src = plv.rr[0]
@@ -619,14 +619,14 @@ def cmd_fmove(buf):
 def cmd_banish(buf):
     for fn in plv.rr:
         banishFile(fn)
-    print('Banished '+str(plv.lenrr)+' files.')
+    print 'Banished '+str(plv.lenrr)+' files.'
 
 def cmd_rm(buf):
     s = getAlias(buf[0].lower())
     if s not in plv.playlists:
-        print('Tag doesn\'t exist.')
+        print 'Tag doesn\'t exist.'
     elif plv.rr == []:
-        print('No files (from search) to modify.')
+        print 'No files (from search) to modify.'
     else:
         invalidate(s)
         ctr = 0
@@ -637,13 +637,13 @@ def cmd_rm(buf):
                 if plv.playlists[s] == []:
                     invalidate()
                 ctr += 1
-        print('Removed tag from '+str(ctr)+' entries.')
+        print 'Removed tag from '+str(ctr)+' entries.'
             
 def cmd_show(buf):
     s = buf[0]
     s = getAlias(s.lower())
     if s not in plv.playlists:
-        print('Tag doesn\'t exist.')
+        print 'Tag doesn\'t exist.'
     else:
         plv.orderASpecialSearch = True
         plv.rr = plv.playlists[s][:]
@@ -655,7 +655,7 @@ def cmd_back(buf):
     traverseCmd(buf[0], -1)
 
 def cmd_list(buf):
-    print('\t'.join(plv.plkeys))
+    print '\t'.join(plv.plkeys)
 
 def cmd_tags(buf):
     ctr = 0
@@ -666,16 +666,16 @@ def cmd_tags(buf):
                 s = ', '.join(plv.taglists[r])
             else:
                 s = ''
-            print(bracketNum(ctr) + s)
+            print bracketNum(ctr) + s
     else:
-        print('Nothing in selection.')
+        print 'Nothing in selection.'
         
 def cmd_wipe(buf):
     wipePlaylists()
 
 def cmd_inv(buf):
     invalidate()
-    print('Invalidated everything.')
+    print 'Invalidated everything.'
     
 def cmd_wn(buf):
     writetags()
@@ -704,13 +704,13 @@ def cmd_newhelper(buf):
     plv.rr = plv.lines
     # exclude albums
     plv.rr = list(filter(lambda x: '\\+ Albums\\' not in x, plv.rr))
-    print('Non-album songs from less than '+str(n)+' days ago:')
+    print 'Non-album songs from less than '+str(n)+' days ago:'
     newr = list(filter(lambda x: fileIsNewAndExists(x, n), plv.rr))
     if newr != []:
         plv.orderASpecialSearch = True
         plv.rr = newr[:]
     else:
-        print('No results. Reverting to last search.')
+        print 'No results. Reverting to last search.'
 
 def cmd_rating(buf):
     parsed = parseCmd(buf[0])
@@ -725,14 +725,14 @@ def cmd_rating(buf):
             n = int(parsed[1])
             pickList = [plv.rr[rrIndex-1]]
     except:
-        print('Invalid input.')
+        print 'Invalid input.'
         return
     for r in pickList:
         key = plv.fileNames2sortKeys[r]
         if key in plv.ratingdata:
-            print(r+': changed from '+str(plv.ratingdata[key])+' to '+str(n)+'.')
+            print r+': changed from '+str(plv.ratingdata[key])+' to '+str(n)+'.'
         else:
-            print(r+': new rating '+str(n)+'.')
+            print r+': new rating '+str(n)+'.'
         plv.ratingdata[key] = n
         plv.ratingdataChanged = True
 
@@ -763,9 +763,9 @@ def cmd_time(buf):
             a = b
             b = t
     except:
-        print('Invalid input.')
+        print 'Invalid input.'
         return  
-    print('Playing songs between '+str(a)+' and '+str(b)+' days old.')
+    print 'Playing songs between '+str(a)+' and '+str(b)+' days old.'
     plv.rr = list(filter(lambda x: plv.ALBUMPATH not in x, plv.lines))
     a = datetime.timedelta(days=a)
     b = datetime.timedelta(days=b)
@@ -858,7 +858,7 @@ def parseSelect(s, mini, maxi):
                     y = range(lb, ub)
                     ret = list(filter(lambda x: x not in y, ret))
         except:
-            print('Bad selection.')
+            print 'Bad selection.'
             ret = []
     return ret
 
@@ -867,7 +867,7 @@ def wipePlaylists():
     for fn in l:
         if fn.endswith('.m3u8'):
             os.remove(plv.ROOTDIR+fn)
-    print('Wiped playlists.')
+    print 'Wiped playlists.'
     invalidate()
 
 def killTag(t, doInvalidate = True):
@@ -878,28 +878,28 @@ def killTag(t, doInvalidate = True):
             plv.plkeys.remove(t)
             invalidate()
         else:
-            print('No-invalidate flag set: '+t)
+            print 'No-invalidate flag set: '+t
         plv.playlists[t] = []
         for r in plv.taglists:
             if t in plv.taglists[r]:
                 plv.taglists[r].remove(t)
-        print('Killed tag: '+t)
+        print 'Killed tag: '+t
     else:
-        print('Tag doesn\'t exist.')
+        print 'Tag doesn\'t exist.'
     
 def printResults(res):
     srcCtr = 0
     for r in res:
         try:
-            print(bracketNum(srcCtr+1)+r)
+            print bracketNum(srcCtr+1)+r
             srcCtr += 1
         except UnicodeEncodeError:
-            print('- bad string decode -')
+            print '- bad string decode -'
     if srcCtr > 0:
-        print()
+        print ''
     if plv.directorySearch:
-        print('This is an ALBUM search.')
-    print('Found '+str(srcCtr)+' items.')
+        print 'This is an ALBUM search.'
+    print 'Found '+str(srcCtr)+' items.'
 
 def stringContainsPosNotNeg(s, pos, neg):
     s = s.lower()
@@ -942,12 +942,12 @@ def grabInput(cq):
         notfirst = False
     x = cq.pop(0).strip()
     if notfirst:
-        print('>> '+x)
+        print '>> '+x
     return x
 
 def main():
     if not os.path.exists(plv.ROOTDIR):
-        print(plv.ROOTDIR+' doesn\'t exist, aborting.')
+        print plv.ROOTDIR+' doesn\'t exist, aborting.'
         input()
         return
     plv.dirFillLines = dirFillToList()
@@ -965,10 +965,10 @@ def main():
     readDirs()
     
     if needAutoBackup():
-        print('Doing autobackup.')
+        print 'Doing autobackup.'
         doBackup(['-doe'])
     else:
-        print('No autobackup needed.')
+        print 'No autobackup needed.'
         
     buf = [None]
     firstRun = True
@@ -977,7 +977,7 @@ def main():
             firstRun = False
         else:
             plv.rr = readRes()
-            print()
+            print ''
         plv.lenrr = len(plv.rr)
         x = grabInput(plv.cmdQueue)
         if not isTheCommand(x, 'move'):
@@ -992,7 +992,7 @@ def main():
         doASelection = False
         plv.continueFlag = False
         if x != '':
-            print()
+            print ''
         else:
             continue
         #command-processing engine
@@ -1004,21 +1004,21 @@ def main():
                 continue
         #commands not yet migrated
         elif x in plv.helplist:
-            print('  - HELP -')
+            print '  - HELP -'
             for c in plv.commandlist:
-                print('\n'+c.asStr())
+                print '\n'+c.asStr()
         elif x[0] == ',':
             sele = x[1:]
             doASelection = True
         elif x[0] == '.':
             x = x[1:]
             if plv.rr == []:
-                print('Can\'t refine this search.')
+                print 'Can\'t refine this search.'
             else:
                 orderASearch = True
                 refinedSearch = True
         elif x[0] == '/':
-            print('Failed command?')
+            print 'Failed command?'
         else:
             orderASearch = True
         if doASelection:
@@ -1031,9 +1031,9 @@ def main():
                     plv.orderASpecialSearch = True
                     plv.rr = [plv.rr[i] for i in ps]
                 else:
-                    print('No results. Reverting to last search.')
+                    print 'No results. Reverting to last search.'
             else:
-                print('Can\'t select from nothing.')
+                print 'Can\'t select from nothing.'
         if plv.orderASpecialSearch:
             orderASearch = True
             refinedSearch = True
@@ -1047,12 +1047,12 @@ def main():
             newSearch(orderSearch(x, plv.rr))
     
     if not nothingToDo() and plv.saveAtEnd:
-        print('\nWriting tags & playlists...')
+        print '\nWriting tags & playlists...'
         writetags()
     else:
-        print('\nNothing was done. No need to save.')
+        print '\nNothing was done. No need to save.'
     saveLog()
-    print('Bye!')
+    print 'Bye!'
     waitAtEnd()
     
 if __name__ == '__main__':
