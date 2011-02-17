@@ -13,6 +13,7 @@ DONTWANTPATH = opj(GENRESPLITPATH, 'z(don\'t want, duplicates or crap)')
 LASTPLSPATH = opj(CDATAPATH, 'last')+plExt
 BACKUPDIRS = [CDATAPATH, opj(ROOTDIR, 'backups')]
 SAVEDPLAYLISTPATH = opj(ROOTDIR, 'saved playlists')
+SETPATH = opj(GENRESPLITPATH, '+ sets')
 
 tagfile = opj(CDATAPATH, 'tags.txt')
 DIRFILLPATH = opj(CDATAPATH, 'dirfill.txt')
@@ -65,6 +66,8 @@ invalidateAllTags = False
 dirlist = []
 cmdLog = []
 commandlist = []
+#key = sortkey
+#value = rating
 ratingdata = {}
 ratingdataChanged = False
 lines = []

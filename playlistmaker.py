@@ -779,14 +779,34 @@ def cmd_time(buf):
     plv.orderASpecialSearch = True
     addMacro('/p')
     
+def fnFilter_nonSet(fn):
+    return not fn.startswith(plv.SETPATH)
+
 def cmd_save(buf):
     inputl = parseCmd(buf[0])
     if len(inputl) == 0 or inputl[0].strip() == '':
         print 'Invalid input.'
         return
-    s = opj(plv.SAVEDPLAYLISTPATH, inputl[0])+plv.plExt
-    plutil.copy(plv.LASTPLSPATH, s)
-    print 'Saved playlist to: '+s
+    dst = opj(plv.SAVEDPLAYLISTPATH, inputl[0])+plv.plExt
+    writePls(dst, list(filter(fnFilter_nonSet, plv.rr)), False)
+    print 'Saved playlist to: '+dst
+    
+def fnFilter_ratingOverN(fn, n):
+    k = plv.fileNames2sortKeys[fn]
+    if k in plv.ratingdata:
+        r = plv.ratingdata[k]
+    else:
+        r = 0
+    return r >= n
+
+def cmd_over(buf):
+    try:
+        n = int(buf[0])
+    except ValueError:
+        n = 1
+    print 'Playing songs with rating >= '+n
+    plv.rr = list(filter(lambda x: fnFilter_ratingOverN(x, n), plv.lines))
+    plv.orderASpecialSearch = True
     
 #----
     
@@ -932,13 +952,16 @@ def filterPosNeg(pos, neg):
     return lambda x: stringContainsPosNotNeg(x, pos, neg)
 
 def orderSearch(x, res):
-    words, negwords = parseCmd(x, 'pn') #differentiate between positive and negative search terms
     if res != []:
-        filter1 = filterPosNeg(words, negwords)
-        if not plv.directorySearch:
-            res = sorted(list(filter(filter1, res)), key=rating, reverse=True)
+        if x == '':
+            filterPN = lambda x: True
         else:
-            res = list(filter(filter1, res))
+            words, negwords = parseCmd(x, 'pn') #differentiate between positive and negative search terms
+            filterPN = filterPosNeg(words, negwords)
+        if not plv.directorySearch:
+            res = sorted(list(filter(filterPN, res)), key=rating, reverse=True)
+        else:
+            res = list(filter(filterPN, res))
     printResults(res)
     if x != '':
         plv.cmdLog.append(x)
