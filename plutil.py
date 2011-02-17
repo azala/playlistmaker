@@ -2,7 +2,7 @@
 # if used only in playlistmaker.py, put it there.
 # if it has even wider use, put it in azutils
 
-import datetime, time, calendar, os, subprocess
+import datetime, time, calendar, os, subprocess, shutil
 import plvars as plv
 from azutils import *
 
@@ -118,4 +118,8 @@ def saveLog():
     f.close()
     
 def fileAge(key):
+    # returns a timedelta
     return invTimetuple(time.gmtime()) - invTimetuple(plv.fileNames2Dates[key])
+
+def copy(src, dst):
+    shutil.copy(src, dst)

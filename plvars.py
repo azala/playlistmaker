@@ -1,6 +1,8 @@
 from azutils import *
 
 #constants
+plExt = '.m3u8'
+
 CDATAPATH = 'C:\\playlistmaker_data'
 ROOTDIR = 'E:\\'
 
@@ -8,8 +10,9 @@ GENRESPLITPATH = opj(ROOTDIR, '+ Genre Split')
 NEWESTPATH = opj(GENRESPLITPATH, '+ NEWEST')
 ALBUMPATH = opj(GENRESPLITPATH, '+ Albums')
 DONTWANTPATH = opj(GENRESPLITPATH, 'z(don\'t want, duplicates or crap)')
-LASTPLSPATH = opj(CDATAPATH, 'last.m3u8')
+LASTPLSPATH = opj(CDATAPATH, 'last')+plExt
 BACKUPDIRS = [CDATAPATH, opj(ROOTDIR, 'backups')]
+SAVEDPLAYLISTPATH = opj(ROOTDIR, 'saved playlists')
 
 tagfile = opj(CDATAPATH, 'tags.txt')
 DIRFILLPATH = opj(CDATAPATH, 'dirfill.txt')
@@ -50,6 +53,8 @@ ptag_index = []
 tag_aliases = {}
 fileNames2sortKeys = {}
 sortKeys2fileNames = {}
+#keys are full file names
+#values are struct_time
 fileNames2Dates = {}
 saveAtEnd = True
 move_file_queue = []

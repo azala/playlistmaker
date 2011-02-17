@@ -1,4 +1,4 @@
-import os, datetime, shutil, time, subprocess
+import os, datetime, shutil, time, subprocess, menu, plutil
 from command import *
 import plvars as plv
 from plutil import *
@@ -388,7 +388,7 @@ def writetags():
         gpl_ctr += 1
         if not plv.invalidateAllTags and v not in plv.invalidateTheseTags:
             continue
-        pf = open(os.path.join(plv.ROOTDIR, '[%02d]'%gpl_ctr + v + '.m3u8'), 'wb')
+        pf = open(os.path.join(plv.ROOTDIR, '[%02d]'%gpl_ctr + v + plv.plExt), 'wb')
         plv.playlists[v].sort(key=lambda x: plv.fileNames2sortKeys[x])
         ctr += 1
         print 'Writing: ('+str(ctr)+'/'+str(lenplkeys)+') '+v
@@ -746,22 +746,28 @@ def ratings_zero_map(x):
 def cmd_ratings(buf):
     printResults(list(map(ratings_zero_map, plv.rr)))
 
-def ageBetween(key, a, b):
-    td = fileAge(key)
+def ageBetween(fn, a, b):
+    td = fileAge(fn)
     return td >= a and td <= b
 
 def cmd_time(buf):
+    default_time_const = 30
     try:
         inputl = parseCmd(buf[0])
-        a = int(inputl[0])
-        try:
-            b = int(inputl[1])
-        except ValueError:
-            b = a + 30
-        if a > b:
-            t = a
-            a = b
-            b = t
+        if len(inputl) == 0:
+            a = fileAge(plv.rr[0]).days - default_time_const/2
+            b = a + default_time_const
+            print 'Defaulting to age of first result file.'
+        else:
+            a = int(inputl[0])
+            try:
+                b = int(inputl[1])
+            except ValueError:
+                b = a + default_time_const
+            if a > b:
+                t = a
+                a = b
+                b = t
     except:
         print 'Invalid input.'
         return  
@@ -772,6 +778,17 @@ def cmd_time(buf):
     plv.rr = list(filter(lambda x: ageBetween(x, a, b), plv.rr))
     plv.orderASpecialSearch = True
     addMacro('/p')
+    
+def cmd_save(buf):
+    inputl = parseCmd(buf[0])
+    if len(inputl) == 0 or inputl[0].strip() == '':
+        print 'Invalid input.'
+        return
+    s = opj(plv.SAVEDPLAYLISTPATH, inputl[0])+plv.plExt
+    plutil.copy(plv.LASTPLSPATH, s)
+    print 'Saved playlist to: '+s
+    
+#----
     
 def getSearchWords(x):
     x = x.replace(r'\ ', spaceHolderString)
@@ -865,7 +882,7 @@ def parseSelect(s, mini, maxi):
 def wipePlaylists():
     l = os.listdir(plv.ROOTDIR)
     for fn in l:
-        if fn.endswith('.m3u8'):
+        if fn.endswith(plv.plExt):
             os.remove(plv.ROOTDIR+fn)
     print 'Wiped playlists.'
     invalidate()
@@ -963,6 +980,8 @@ def main():
     fillTagAliases()
     readtags()
     readDirs()
+    
+    #menu.main(sys.argv)
     
     if needAutoBackup():
         print 'Doing autobackup.'
