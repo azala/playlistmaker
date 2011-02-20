@@ -7,11 +7,9 @@ def decoded(lines):
     for l in lines:
         ls = l.decode('utf').split('\t')
         fn = ls[0]
-        #fn = l.decode('utf')[:-2]
         k = fn.rpartition('\\')[2].lower()
-        #k = ls[1][:-2]
         if k in ret and boo:
-            print k
+            print str(k)
             print '  '+ret[k]
             print '  '+fn
             i = raw_input('Move which one?\n>> ')

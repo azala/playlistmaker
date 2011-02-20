@@ -827,7 +827,7 @@ def cmd_over(buf):
     plv.orderASpecialSearch = True
     
 #----
-    
+
 def getSearchWords(x):
     x = x.replace(r'\ ', spaceHolderString)
     return list(map(lambda y: y.strip().replace(spaceHolderString, ' '), x.split(' ')))
@@ -1055,6 +1055,12 @@ def main():
     while True:
         if firstRun:
             firstRun = False
+            try:
+                #preprocess code
+                addMacro(';'.join(clean(fread(plv.preprocess_file))))
+                print 'Using preprocess file...'
+            except:
+                pass
         else:
             plv.rr = readRes()
             print ''

@@ -15,6 +15,7 @@ BACKUPDIRS = [CDATAPATH, opj(ROOTDIR, 'backups')]
 SAVEDPLAYLISTPATH = opj(ROOTDIR, 'saved playlists')
 SETPATH = opj(GENRESPLITPATH, '+ sets')
 
+preprocess_file = opj(CDATAPATH, 'preprocess.txt')
 tagfile = opj(CDATAPATH, 'tags.txt')
 DIRFILLPATH = opj(CDATAPATH, 'dirfill.txt')
 tag_indexfile = opj(CDATAPATH, 'tag_index.txt')
