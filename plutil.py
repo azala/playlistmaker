@@ -42,7 +42,8 @@ def writePls(fn, songlist, sort):
         sl = sorted(songlist, key=lambda x: plv.fileNames2sortKeys[x])
     else:
         print 'Not sorting this playlist.'
-        sl = sorted(songlist)
+        #sl = sorted(songlist)
+        sl = songlist
     sl = unclean(sl)
     fwrite(sl, fn)
     

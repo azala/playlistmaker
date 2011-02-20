@@ -3,6 +3,14 @@ from command import *
 import plvars as plv
 from plutil import *
 
+class ParseCmdResult:
+    def __init__(self):
+        self.careAboutNegs = False
+        self.terms = []
+        self.negTerms = []
+        #self.flags = []
+        self.params = {}
+
 def fileIsNewAndExists(fn, n):
     try:
         return fileIsNew(fn, n)
@@ -433,16 +441,26 @@ def cmd_this(lbuf):
 
 def cmd_tag(buf):
     plv.lastCmdWasSearch = False
-    t = getAlias(buf[0].lower())
+    pcr = parseCmdHelper(buf[0])
+    l = len(pcr.terms)
+    if l == 2:
+        try:
+            n = int(pcr.terms[0])
+            rrhelper = [plv.rr[n-1]]
+        except:
+            rrhelper = plv.rr
+    else:
+        rrhelper = plv.rr
+    t = getAlias(pcr.terms[l-1].lower())
     if '"' in t or "'" in t:
         print 'Bad tag name.'
         return
     plv.lastTag = t
     print 'Applying tag: '+t
-    rr = readRes()
+    #plv.rr = readRes()
     invalidatedAlready = False
     ctr = 0
-    for r in rr:
+    for r in rrhelper:
         plv.didAnything = True
         if t in plv.playlists:
             if r not in plv.playlists[t]:
@@ -788,7 +806,7 @@ def cmd_save(buf):
         print 'Invalid input.'
         return
     dst = opj(plv.SAVEDPLAYLISTPATH, inputl[0])+plv.plExt
-    writePls(dst, list(filter(fnFilter_nonSet, plv.rr)), False)
+    writePls(dst, list(filter(fnFilter_nonSet, plv.rr)), True)
     print 'Saved playlist to: '+dst
     
 def fnFilter_ratingOverN(fn, n):
@@ -804,7 +822,7 @@ def cmd_over(buf):
         n = int(buf[0])
     except ValueError:
         n = 1
-    print 'Playing songs with rating >= '+n
+    print 'Playing songs with rating >= '+str(n)
     plv.rr = list(filter(lambda x: fnFilter_ratingOverN(x, n), plv.lines))
     plv.orderASpecialSearch = True
     
@@ -814,16 +832,17 @@ def getSearchWords(x):
     x = x.replace(r'\ ', spaceHolderString)
     return list(map(lambda y: y.strip().replace(spaceHolderString, ' '), x.split(' ')))
 
-#parsing searches and tag/rm
-#returns a list
-def parseCmd(s, *flags):
+def parseCmdHelper(s, *flags):
     inQuote = False
     slashed = False
     negated = False
-    careAboutNeg = 'pn' in flags
+    inAssignment = False
     term = ''
-    terms = []
-    negatedTerms = []
+    curAssignment = ''
+    pcr = ParseCmdResult()
+    pcr.careAboutNegs = 'pn' in flags
+    pcr.terms = []
+    pcr.negTerms = []
     for c in s:
         if slashed:
             term += c
@@ -836,28 +855,46 @@ def parseCmd(s, *flags):
             if inQuote:
                 term += c
             else:
-                if careAboutNeg and negated:
-                    negatedTerms.append(term)
+                if inAssignment:
+                    pcr.params[curAssignment] = term
+                elif pcr.careAboutNegs and negated:
+                    pcr.negTerms.append(term)
                 else:
-                    terms.append(term)
+                    pcr.terms.append(term)
                 term = ''
                 negated = False
+                inAssignment = False
         elif c == '-':
             if inQuote:
                 term += c
             else:
                 negated = True
+        elif c == '=':
+            curAssignment = term
+            term = ''
+            inAssignment = True
         else:
             term += c
     if term != '':
-        if careAboutNeg and negated:
-            negatedTerms.append(term)
+        if inAssignment:
+            pcr.params[curAssignment] = term
+        elif pcr.careAboutNegs and negated:
+            pcr.negTerms.append(term)
         else:
-            terms.append(term)
-    if careAboutNeg:
-        return terms, negatedTerms
+            pcr.terms.append(term)
+        term = ''
+        negated = False
+        inAssignment = False
+    return pcr
+
+#parsing searches and tag/rm
+#returns a list
+def parseCmd(s, *flags):
+    pcr = parseCmdHelper(s, *flags)
+    if pcr.careAboutNegs:
+        return pcr.terms, pcr.negTerms
     else:
-        return terms
+        return pcr.terms
 
 #parsing within-list numerical selections
 def parseSelect(s, mini, maxi):
@@ -912,7 +949,8 @@ def killTag(t, doInvalidate = True):
         plv.didAnything = True
         if doInvalidate:
             del plv.playlists[t]
-            plv.plkeys.remove(t)
+            if t in plv.plkeys:
+                plv.plkeys.remove(t)
             invalidate()
         else:
             print 'No-invalidate flag set: '+t
