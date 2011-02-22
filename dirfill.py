@@ -12,7 +12,7 @@ filesAlreadyInList = []
 
 def recurlist(d):
     global ctr, files
-    for f in os.listdir(d):
+    for f in listdir(d):
         f = os.path.join(d, f)
         if not os.path.isdir(f):
             x = f.rpartition('.')[2].lower()
@@ -32,7 +32,7 @@ dirs = []
 dirCtr = 0
 def findAllDirsIn(d):
     global dirs, dirCtr
-    for f in os.listdir(d):
+    for f in listdir(d):
         f = opj(d, f)
         if os.path.isdir(f) and f not in plv.excludedirs:
             dirCtr += 1
@@ -61,7 +61,8 @@ else:
     out.writelines(files)
     out.close()
 
-subprocess.call(['python', 'redo_tags.py']+sys.argv[1:])
+#subprocess.call(['python2.7', 'redo_tags.py']+sys.argv[1:])
+os.system('python2.7 redo_tags.py '+' '.join(sys.argv[1:]))
 
 waitAtEnd()
 

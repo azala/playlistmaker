@@ -270,7 +270,7 @@ def doBackup(buf = ['']):
     except:
         print 'Invalid input.'
     doE = '-doe' in params
-    filelist = list(filter(lambda x: x.endswith('.txt'), os.listdir(plv.CDATAPATH)))
+    filelist = list(filter(lambda x: x.endswith('.txt'), listdir(plv.CDATAPATH)))
     curTime = dateTimeStr(time.gmtime())
     fdir = opj(mainBackupDir(), curTime)
     print 'Creating backup in: '+fdir
@@ -772,6 +772,7 @@ def cmd_time(buf):
     default_time_const = 30
     try:
         inputl = parseCmd(buf[0])
+        print inputl
         if len(inputl) == 0:
             a = fileAge(plv.rr[0]).days - default_time_const/2
             b = a + default_time_const
@@ -780,7 +781,7 @@ def cmd_time(buf):
             a = int(inputl[0])
             try:
                 b = int(inputl[1])
-            except ValueError:
+            except:
                 b = a + default_time_const
             if a > b:
                 t = a
@@ -937,7 +938,7 @@ def parseSelect(s, mini, maxi):
     return ret
 
 def wipePlaylists():
-    l = os.listdir(plv.ROOTDIR)
+    l = listdir(plv.ROOTDIR)
     for fn in l:
         if fn.endswith(plv.plExt):
             os.remove(plv.ROOTDIR+fn)
@@ -1057,8 +1058,10 @@ def main():
             firstRun = False
             try:
                 #preprocess code
-                addMacro(';'.join(clean(fread(plv.preprocess_file))))
-                print 'Using preprocess file...'
+                l = clean(fread(plv.preprocess_file))
+                if l != []:
+                    addMacro(';'.join(l))
+                    print 'Using preprocess file...'
             except:
                 pass
         else:

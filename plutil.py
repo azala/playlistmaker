@@ -2,7 +2,7 @@
 # if used only in playlistmaker.py, put it there.
 # if it has even wider use, put it in azutils
 
-import datetime, time, calendar, os, subprocess, shutil
+import datetime, time, calendar, os, subprocess, shutil, sys
 import plvars as plv
 from azutils import *
 
@@ -35,7 +35,7 @@ def dirFillToList():
     return dfl
 
 def dataToDirFillLine(l):
-    return ('\t'.join(l)+'\r\n').encode('utf')
+    return ('\t'.join(l)+'\r\n').encode('utf-8')
 
 def writePls(fn, songlist, sort):
     if sort:
@@ -79,7 +79,7 @@ def backupDirFilter(x, bkdir):
     return x.count('-') == 3
         
 def needAutoBackup(bdir = mainBackupDir()):
-    d = os.listdir(bdir)
+    d = listdir(bdir)
     d = filter(lambda x: backupDirFilter(x, bdir), d)
     if d == []:
         return True
