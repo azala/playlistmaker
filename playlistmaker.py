@@ -1027,7 +1027,7 @@ def grabInput(cq):
 def main():
     if not os.path.exists(plv.ROOTDIR):
         print plv.ROOTDIR+' doesn\'t exist, aborting.'
-        input()
+        raw_input()
         return
     plv.dirFillLines = dirFillToList()
     for l in plv.dirFillLines:
@@ -1043,7 +1043,8 @@ def main():
     readtags()
     readDirs()
     
-    #menu.main(sys.argv)
+    menu.main(sys.argv)
+    sys.exit(0)
     
     if needAutoBackup():
         print 'Doing autobackup.'

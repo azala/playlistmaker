@@ -1,4 +1,5 @@
 import wx, sys
+import wx.gizmos as gz
 import plvars as plv
 from playlistmaker import *
 
@@ -18,7 +19,10 @@ class MyFrame(wx.Frame):
 
         plTreePanel = wx.Panel(self, wx.ID_ANY, pos=(5,5), size=(190,390))
         plTreePanel.Show(True)
-        self.plTree = wx.TreeCtrl(plTreePanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TR_DEFAULT_STYLE)
+        self.plTree = wx.TreeCtrl(plTreePanel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize,
+                                  wx.TR_DEFAULT_STYLE
+                                  | wx.TR_MULTIPLE
+                                  | wx.TR_HIDE_ROOT)
         self.root = self.plTree.AddRoot('Tags')
         #sample sizer code
         bdr = wx.BoxSizer(wx.HORIZONTAL)
