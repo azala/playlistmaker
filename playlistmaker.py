@@ -505,7 +505,8 @@ def cmd_ds(buf):
         addMacro(buf[0])
         plv.continueFlag = True
         return
-    elif plv.directorySearch:
+    plv.allowRefine = False
+    if plv.directorySearch:
         print 'Directory search flag OFF.'
     else:
         print 'Directory search flag ON.'
@@ -538,7 +539,7 @@ def cmd_p(buf):
             print 'Could not play files.'
     elif num < plv.lenrr and num >= 0:
         if plv.directorySearch:
-            addMacro('/ds;"'+plv.rr[num]+'";/p --nosort')
+            addMacro('/ds;/cfds on;"'+plv.rr[num]+'";/cfds off;/p --nosort')
             plv.continueFlag = True
             return
         if playFile(plv.rr[num], not nosortFlag):
@@ -658,8 +659,11 @@ def cmd_rm(buf):
         print 'Removed tag from '+str(ctr)+' entries.'
             
 def cmd_show(buf):
-    s = buf[0]
-    s = getAlias(s.lower())
+    if plv.directorySearch:
+        print 'Can\'t do this in a directory search.'
+        plv.continueFlag = True
+        return
+    s = getAlias(buf[0].lower())
     if s not in plv.playlists:
         print 'Tag doesn\'t exist.'
     else:
@@ -680,10 +684,7 @@ def cmd_tags(buf):
     if plv.rr != []:
         for r in plv.rr:
             ctr += 1
-            if r in plv.taglists:
-                s = ', '.join(plv.taglists[r])
-            else:
-                s = ''
+            s = tagsAsString(r)
             print bracketNum(ctr) + s
     else:
         print 'Nothing in selection.'
@@ -827,7 +828,45 @@ def cmd_over(buf):
     plv.rr = list(filter(lambda x: fnFilter_ratingOverN(x, n), plv.lines))
     plv.orderASpecialSearch = True
     
+def cmd_cfds(buf):
+    if buf[0] == 'on':
+        plv.comesFromDirectorySearch = True
+        print 'cfds ON'
+    elif buf[0] == 'off':
+        plv.comesFromDirectorySearch = False
+        print 'cfds OFF'
+        
+def cmd_info(buf):
+    print '=== INFO ==='
+    print ''
+    print 'allowRefine: '+boolstr(plv.allowRefine)
+    print 'comesFromDirectorySearch: '+boolstr(plv.comesFromDirectorySearch)
+    print 'continueFlag: '+boolstr(plv.continueFlag)
+    print 'didAnything: '+boolstr(plv.didAnything)
+    print 'directorySearch: '+boolstr(plv.directorySearch)
+    print 'invalidateAllTags: '+boolstr(plv.invalidateAllTags)
+    print 'lastCmdWasSearch: '+boolstr(plv.lastCmdWasSearch)
+    print 'lastTag: '+lastTagToStr()
+    print 'needRewriteDirfill: '+boolstr(plv.needRewriteDirfill)
+    print 'orderASpecialSearch: '+boolstr(plv.orderASpecialSearch)
+    print 'ratingdataChanged: '+boolstr(plv.ratingdataChanged)
+    print 'rptr: '+str(plv.rptr)
+    
 #----
+def boolstr(b):
+    if b:
+        return 'YES'
+    else:
+        return '-'
+
+def lastTagToStr():
+    if plv.lastTag == None:
+        return '<None>'
+    else:
+        return plv.lastTag
+
+def canRefine():
+    return plv.allowRefine and len(plv.rr) > 0
 
 def getSearchWords(x):
     x = x.replace(r'\ ', spaceHolderString)
@@ -997,10 +1036,10 @@ def orderSearch(x, res):
         else:
             words, negwords = parseCmd(x, 'pn') #differentiate between positive and negative search terms
             filterPN = filterPosNeg(words, negwords)
-        if not plv.directorySearch:
-            res = sorted(list(filter(filterPN, res)), key=rating, reverse=True)
-        else:
+        if plv.comesFromDirectorySearch or plv.directorySearch:
             res = list(filter(filterPN, res))
+        else:
+            res = sorted(list(filter(filterPN, res)), key=rating, reverse=True)
     printResults(res)
     if x != '':
         plv.cmdLog.append(x)
@@ -1043,8 +1082,12 @@ def main():
     readtags()
     readDirs()
     
-    menu.main(sys.argv)
-    sys.exit(0)
+    if len(sys.argv) > 1 and sys.argv[1] == '-menu':
+        argv = sys.argv[0:1]
+        if len(sys.argv) > 2:
+            argv += sys.argv[2:]
+        menu.main(argv)
+        sys.exit(0)
     
     if needAutoBackup():
         print 'Doing autobackup.'
@@ -1098,12 +1141,17 @@ def main():
             for c in plv.commandlist:
                 print '\n'+c.asStr()
         elif x[0] == ',':
-            sele = x[1:]
-            doASelection = True
+            if not canRefine():
+                print 'Can\'t refine this search.'
+                continue
+            else:
+                sele = x[1:]
+                doASelection = True
         elif x[0] == '.':
             x = x[1:]
-            if plv.rr == []:
+            if not canRefine():
                 print 'Can\'t refine this search.'
+                continue
             else:
                 orderASearch = True
                 refinedSearch = True
@@ -1115,7 +1163,7 @@ def main():
             if plv.rr != []:
                 ps = parseSelect(sele, 1, plv.lenrr)
                 if plv.directorySearch and len(ps) == 1:
-                    addMacro('/ds;"'+plv.rr[ps[0]]+'"')
+                    addMacro('/ds;/cfds on;"'+plv.rr[ps[0]]+'";/cfds off')
                     continue
                 elif ps != []:
                     plv.orderASpecialSearch = True
@@ -1135,6 +1183,7 @@ def main():
                 else:
                     plv.rr = plv.lines
             newSearch(orderSearch(x, plv.rr))
+            plv.allowRefine = True
     
     if not nothingToDo() and plv.saveAtEnd:
         print '\nWriting tags & playlists...'

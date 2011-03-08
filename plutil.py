@@ -124,3 +124,10 @@ def fileAge(key):
 
 def copy(src, dst):
     shutil.copy(src, dst)
+    
+def tagsAsString(fn):
+    if fn in plv.taglists:
+        s = ', '.join(plv.taglists[fn])
+    else:
+        s = ''
+    return s
