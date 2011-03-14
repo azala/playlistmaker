@@ -1014,7 +1014,7 @@ def printResults(res):
             print bracketNum(srcCtr+1)+r
             srcCtr += 1
         except UnicodeEncodeError:
-            print '- bad string decode -'
+            print plv.cBadStr
     if srcCtr > 0:
         print ''
     if plv.directorySearch:

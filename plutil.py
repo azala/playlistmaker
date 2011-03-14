@@ -22,6 +22,17 @@ def pathToFileNameKey(p):
         x = x[a:]
     return x
 
+#takes a list of filenames
+def shortNameToFullDict(l):
+    ret = {}
+    for fn in l:
+        k = fn.rpartition('\\')[2].lower()
+        if k in ret:
+            ret[k].append(fn)
+        else:
+            ret[k] = [fn]
+    return ret
+
 def bracketNum(n):
     return '[%3d] '%n
 

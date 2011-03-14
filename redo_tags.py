@@ -1,11 +1,12 @@
 import os, shutil, sys
 import plvars as plv
+from plutil import *
 
 def decoded(lines):
     ret = {}
     boo = len(sys.argv) >= 2 and '-r' in sys.argv
-    for l in lines:
-        ls = l.decode('utf').split('\t')
+    for ls in lines:
+        #ls = l.decode('utf').split('\t')
         fn = ls[0]
         k = fn.rpartition('\\')[2].lower()
         if k in ret and boo:
@@ -23,21 +24,25 @@ def decoded(lines):
     return ret
 
 f = open(plv.DIRFILLPATH, 'rb')
-fdict = decoded(f.readlines())
+l = list(map(lambda x: x.decode('utf').split('\t'), f.readlines()))
+kmdict = shortNameToFullDict(list(map(lambda x: x[0], l)))
+fdict = decoded(l)
 f.close()
 
 g = open(plv.tagfile, 'rb')
 glist = map(lambda x: list(x.decode('utf').partition('\t')), g.readlines())
 g.close()
+
 ret = []
 for gl in glist:
-    glrp = gl[0].rpartition('\\')[2].lower()
-    if glrp in fdict and gl[0] != fdict[glrp]:
+    glShort = gl[0].rpartition('\\')[2].lower()
+    if glShort in kmdict and gl[0] not in kmdict[glShort]:
         try:
-            print 'Detected move: '+glrp
+            print 'Detected move: '+glShort
         except:
+            print plv.cBadStr
             pass
-        gl[0] = fdict[glrp]
+        gl[0] = kmdict[glShort][0]
     ret += gl
 print 'Writing tags...'
 g = open(plv.tagfile, 'wb')

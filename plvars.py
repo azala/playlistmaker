@@ -38,6 +38,9 @@ excludedirs = [DONTWANTPATH,
 FUNC_PREFIX = 'cmd_'
 AUTOBACKUP_INTERVAL = 3 #days after last backup before automatically making another
 
+#messages
+cBadStr = '- bad string decode -'
+
 #settings
 WAITATEND = False
 
