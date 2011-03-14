@@ -28,7 +28,7 @@ ratingFile = opj(CDATAPATH, 'ratings.txt')
 
 mediaplayer = 'winamp'
 notepad = 'notepad++'
-extns = ['mp3','wav','aac','ogg','flac','wma']
+extns = ['mp3','wav','aac','ogg','flac','wma','m4a']
 excludedirs = [DONTWANTPATH,
                opj(GENRESPLITPATH, 'other'),
                opj(ROOTDIR, '.rockbox'),

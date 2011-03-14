@@ -7,6 +7,7 @@ class MyFrame(wx.Frame):
     def __init__(self, parent, id):
         wx.Frame.__init__(self, parent, id, 'Playlistmaker v0.1', size=(400,400))
         #self.log = log
+        self.itemData = {}
         self.CenterOnScreen()
         self.CreateStatusBar()
         menubar = wx.MenuBar()
@@ -48,17 +49,54 @@ class MyFrame(wx.Frame):
         self.Close(True)
     def OnMouseRightDown(self, event):
         menu = wx.Menu()
-        item = wx.MenuItem(menu, wx.NewId(), "One")
+        item = wx.MenuItem(menu, wx.NewId(), 'Rating -> 0')
+        menu.Bind(wx.EVT_MENU, self.OnRatingZero, item)
+        menu.AppendItem(item)
         self.PopupMenu(menu)
         menu.Destroy()
+    def OnRatingZero(self, event):
+        for s in self.plTree.GetSelections():
+            x = GetChildren(self.plTree, s)
+            if len(x) == 0:
+                fn = self.plTree.GetItemPyData(s)
+                self.itemData[fn].rating = 0
+                self.updateItem(s)
     def fillTagTree(self):
+        knownFiles = []
         for t in plkeysSorted():
             tagNode = self.plTree.AppendItem(self.root, t)
             for fn in sorted(plv.playlists[t], key=lambda x: plv.fileNames2sortKeys[x]):
-                k = plv.fileNames2sortKeys[fn]
-                child = self.plTree.AppendItem(tagNode, fn.rpartition('\\')[2])
-                self.plTree.SetItemText(child, str(ratings_zero_map(fn)), 1)
-                self.plTree.SetItemText(child, tagsAsString(fn), 2)
+                if fn not in knownFiles:
+                    knownFiles.append(fn)
+                    sd = SongData()
+                    sd.fileName = fn
+                    sd.sortKey = plv.fileNames2sortKeys[fn]
+                    sd.rating = rating(fn)
+                    sd.tags = plv.taglists[fn]
+                    self.itemData[fn] = sd
+                child = self.plTree.AppendItem(tagNode, '')
+                self.plTree.SetItemPyData(child, fn)
+                self.updateItem(child)
+    def updateItem(self, item):
+        sd = self.itemData[self.plTree.GetItemPyData(item)]
+        self.plTree.SetItemText(item, sd.fileName.rpartition('\\')[2], 0)
+        self.plTree.SetItemText(item, ratingToString(sd.rating), 1)
+        self.plTree.SetItemText(item, tagListToString(sd.tags), 2)
+
+def GetChildren(tree, item):
+    l = []
+    x = tree.GetFirstChild(item)[0]
+    while x.IsOk():
+        print tree.GetItemPyData(x)
+        l.append(x)
+        x = tree.GetNextSibling(x)
+    return l
+        
+class SongData(object):
+    fileName = ''
+    sortKey = ''
+    rating = 0
+    tags = []
         
 def main(argv):
     app = wx.App(False)

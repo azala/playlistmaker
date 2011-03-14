@@ -756,11 +756,7 @@ def cmd_rating(buf):
         plv.ratingdataChanged = True
 
 def ratings_zero_map(x):
-    i = rating(x)
-    if i == 0:
-        return ''
-    else:
-        return str(i)
+    return ratingToString(rating(x))
 
 def cmd_ratings(buf):
     printResults(list(map(ratings_zero_map, plv.rr)))
@@ -772,8 +768,12 @@ def ageBetween(fn, a, b):
 def cmd_time(buf):
     default_time_const = 30
     try:
+        includeAlbums = False
         inputl = parseCmd(buf[0])
-        print inputl
+        if len(inputl) > 0 and inputl[0] == 'ia':
+            print 'Including album songs.'
+            includeAlbums = True
+            inputl = inputl[1:]
         if len(inputl) == 0:
             a = fileAge(plv.rr[0]).days - default_time_const/2
             b = a + default_time_const
@@ -792,7 +792,10 @@ def cmd_time(buf):
         print 'Invalid input.'
         return  
     print 'Playing songs between '+str(a)+' and '+str(b)+' days old.'
-    plv.rr = list(filter(lambda x: plv.ALBUMPATH not in x, plv.lines))
+    if includeAlbums:
+        plv.rr = plv.lines[:]
+    else:
+        plv.rr = list(filter(lambda x: plv.ALBUMPATH not in x, plv.lines))
     a = datetime.timedelta(days=a)
     b = datetime.timedelta(days=b)
     plv.rr = list(filter(lambda x: ageBetween(x, a, b), plv.rr))

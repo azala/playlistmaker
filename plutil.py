@@ -127,7 +127,19 @@ def copy(src, dst):
     
 def tagsAsString(fn):
     if fn in plv.taglists:
-        s = ', '.join(plv.taglists[fn])
+        tl = plv.taglists[fn]
     else:
-        s = ''
-    return s
+        tl = []
+    return tagListToString(tl)
+
+def tagListToString(taglist):
+    return ', '.join(taglist)
+
+def ratingToString(r):
+    if r == 0:
+        return ''
+    else:
+        return str(r)
+
+
+    
