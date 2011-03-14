@@ -747,7 +747,8 @@ def cmd_rating(buf):
         print 'Invalid input.'
         return
     for r in pickList:
-        key = plv.fileNames2sortKeys[r]
+        #key = plv.fileNames2sortKeys[r]
+        key = r
         if key in plv.ratingdata:
             print r+': changed from '+str(plv.ratingdata[key])+' to '+str(n)+'.'
         else:
@@ -815,7 +816,8 @@ def cmd_save(buf):
     print 'Saved playlist to: '+dst
     
 def fnFilter_ratingOverN(fn, n):
-    k = plv.fileNames2sortKeys[fn]
+    #k = plv.fileNames2sortKeys[fn]
+    k = fn
     if k in plv.ratingdata:
         r = plv.ratingdata[k]
     else:
@@ -1049,7 +1051,8 @@ def orderSearch(x, res):
     return res
 
 def rating(fn):
-    sk = plv.fileNames2sortKeys[fn]
+    #sk = plv.fileNames2sortKeys[fn]
+    sk = fn
     try:
         return plv.ratingdata[sk]
     except KeyError:
