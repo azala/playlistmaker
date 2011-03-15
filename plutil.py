@@ -12,7 +12,8 @@ class Tag(object):
                      'songs' : songs}
         
 def getTag(name):
-    return filter(lambda x: x.data['name'] == name, plv.tags)[0]
+    return next((tag for tag in plv.tags if tag.data['name'] == name), None)
+    #return filter(lambda x: x.data['name'] == name, plv.tags)[0]
 
 class SongData(object):
     def __init__(self, fn = '', sk = '', rating = 0, tags = [], mtime = time.gmtime(0)):
@@ -26,7 +27,12 @@ def getSongs(attrName, attrValue, songs):
     return filter(lambda x: x.data[attrName] == attrValue, songs)
 
 def getSongByName(name):
-    return getSongs('fn', name, plv.songs)[0] #because it better return only one result...
+    #x = getSongs('fn', name, plv.songs)
+    #for s in x:
+    #    if 'VACANCY' in s.data['fn']:
+    #        print s.data
+    return next((song for song in plv.songs if song.data['fn'] == name), None)
+    #return getSongs('fn', name, plv.songs)[0] #because it better return only one result...
 
 def mainBackupDir():
     return plv.BACKUPDIRS[0]

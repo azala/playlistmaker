@@ -48,4 +48,12 @@ print 'Writing tags...'
 g = open(plv.tagfile, 'wb')
 g.writelines(map(lambda x: ''.join(x).encode('utf'), ret))
 g.close()
+print 'Writing ratings...'
+h = clean(fread(plv.ratingFile))
+dst = []
+for ratingLine in h:
+    pt = ratingLine.partition('\t')
+    short = pt[0].rpartition('\\')[2].lower()
+    dst.append(kmdict[short][0]+'\t'+pt[2])
+fwrite(unclean(dst), plv.ratingFile)
 print 'Done!\n'

@@ -56,6 +56,7 @@ results = []
 cmdQueue = []
 ptag_index = []
 songs = []
+songsByName = {}
 tags = []
 tag_aliases = {}
 fileNames2sortKeys = {}

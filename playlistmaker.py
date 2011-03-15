@@ -100,7 +100,7 @@ def rewriteDirfillIfNeeded():
 def readRatingData():
     for l in clean(fread(plv.ratingFile)):
         k, v = l.split('\t')
-        getSongs('fn', k, plv.songs)[0]['rating'] = int(v)
+        getSongByName(k).data['rating'] = int(v)
         plv.ratingdata[k] = int(v)
     print 'Loaded rating data.'
     
@@ -342,9 +342,9 @@ def readtags():
                 v = w
             v = w.lower()
             #
-            if v not in map(lambda x: x.data['name'], tags):
+            if v not in map(lambda x: x.data['name'], plv.tags):
                 t = Tag(v)
-                tags.append(t)
+                plv.tags.append(t)
             else:
                 t = getTag(v)
             t.data['songs'].append(l[0])
@@ -361,7 +361,7 @@ def readtags():
                     plv.taglists[l[0]] += [v]
             else:
                 plv.taglists[l[0]] = [v]
-            getSongByName(l[0])['tags'].append(v)
+            getSongByName(l[0]).data['tags'].append(v)
     for t in invalidateTheseLater:
         invalidate(t)
     print 'Read tags & playlists.'
