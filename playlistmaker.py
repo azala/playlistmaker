@@ -100,6 +100,7 @@ def rewriteDirfillIfNeeded():
 def readRatingData():
     for l in clean(fread(plv.ratingFile)):
         k, v = l.split('\t')
+        getSongs('fn', k, plv.songs)[0]['rating'] = int(v)
         plv.ratingdata[k] = int(v)
     print 'Loaded rating data.'
     
@@ -237,7 +238,7 @@ def getAlias(k, boo = True):
         return k
         
 def defaultListFilter(l):
-    return filter(lambda x: x != '', map(lambda x: x.strip().decode('utf-8'), l))
+    return filter(lambda x: x != '', map(lambda x: x.strip().decode('utf'), l))
         
 def fillTagAliases():
     inf = open(plv.tag_aliasfile, 'rb')
@@ -352,6 +353,7 @@ def readtags():
                     plv.taglists[l[0]] += [v]
             else:
                 plv.taglists[l[0]] = [v]
+            getSongByName(l[0])['tags'].append(v)
     for t in invalidateTheseLater:
         invalidate(t)
     print 'Read tags & playlists.'
@@ -1076,12 +1078,17 @@ def main():
         return
     plv.dirFillLines = dirFillToList()
     for l in plv.dirFillLines:
+        sd = SongData()
+        plv.songs.append(sd)
+        sd.data['fn'] = l[0]
         plv.lines.append(l[0])
         #use dirfill's filename sort key (index 1)
+        sd.data['sk'] = l[1]
         plv.fileNames2sortKeys[l[0]] = l[1]
         #use dirfill's creation date if available (index 2)
         if len(l) >= 3:
-            plv.fileNames2Dates[l[0]] = invDateTimeStr(l[2])
+            sd.data['mtime'] = invDateTimeStr(l[2])
+            plv.fileNames2Dates[l[0]] = invDateTimeStr(l[2])        
     plv.sortKeys2fileNames = dict((v,k) for (k,v) in plv.fileNames2sortKeys.items())
     readRatingData()
     fillTagAliases()

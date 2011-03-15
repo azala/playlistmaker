@@ -55,6 +55,7 @@ lastTag = None
 results = []
 cmdQueue = []
 ptag_index = []
+songs = []
 tag_aliases = {}
 fileNames2sortKeys = {}
 sortKeys2fileNames = {}

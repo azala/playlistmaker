@@ -6,12 +6,25 @@ import datetime, time, calendar, os, subprocess, shutil, sys
 import plvars as plv
 from azutils import *
 
+class Tag(object):
+    knownNames = []
+    def __init__(self, name = '', songs = []):
+        self.data = {'name' : name,
+                     'songs' : songs}
+
 class SongData(object):
-    def __init__(self):
-        self.fn = '' #file name
-        self.sk = '' #sort key
-        self.rating = 0
-        self.tags = []
+    def __init__(self, fn = '', sk = '', rating = 0, tags = [], mtime = time.gmtime(0)):
+        self.data = {'fn' : fn,
+                     'sk' : sk,
+                     'rating' : rating,
+                     'tags' : tags,
+                     'mtime' : mtime}
+        
+def getSongs(attrName, attrValue, songs):
+    return list(filter(lambda x: x.data[attrName] == attrValue, songs))
+
+def getSongByName(name):
+    return getSongs('fn', name, plv.songs)[0] #because it better return only one result...
 
 def mainBackupDir():
     return plv.BACKUPDIRS[0]
