@@ -68,7 +68,7 @@ class MyFrame(wx.Frame):
             for fn in sorted(plv.playlists[t], key=lambda x: plv.fileNames2sortKeys[x]):
                 if fn not in knownFiles:
                     knownFiles.append(fn)
-                    sd = SongData()
+                    sd = SongNodeData()
                     sd.fileName = fn
                     sd.sortKey = plv.fileNames2sortKeys[fn]
                     sd.rating = rating(fn)
@@ -92,7 +92,7 @@ def GetChildren(tree, item):
         x = tree.GetNextSibling(x)
     return l
         
-class SongData(object):
+class SongNodeData(object):
     fileName = ''
     sortKey = ''
     rating = 0

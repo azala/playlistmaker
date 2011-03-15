@@ -6,6 +6,13 @@ import datetime, time, calendar, os, subprocess, shutil, sys
 import plvars as plv
 from azutils import *
 
+class SongData(object):
+    def __init__(self):
+        self.fn = '' #file name
+        self.sk = '' #sort key
+        self.rating = 0
+        self.tags = []
+
 def mainBackupDir():
     return plv.BACKUPDIRS[0]
 
