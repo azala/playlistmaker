@@ -7,10 +7,12 @@ import plvars as plv
 from azutils import *
 
 class Tag(object):
-    knownNames = []
     def __init__(self, name = '', songs = []):
         self.data = {'name' : name,
                      'songs' : songs}
+        
+def getTag(name):
+    return filter(lambda x: x.data['name'] == name, plv.tags)[0]
 
 class SongData(object):
     def __init__(self, fn = '', sk = '', rating = 0, tags = [], mtime = time.gmtime(0)):
@@ -21,7 +23,7 @@ class SongData(object):
                      'mtime' : mtime}
         
 def getSongs(attrName, attrValue, songs):
-    return list(filter(lambda x: x.data[attrName] == attrValue, songs))
+    return filter(lambda x: x.data[attrName] == attrValue, songs)
 
 def getSongByName(name):
     return getSongs('fn', name, plv.songs)[0] #because it better return only one result...

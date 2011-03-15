@@ -339,8 +339,16 @@ def readtags():
             if v != w:
                 print 'Converting alias "'+v+'" to "'+w+'".'
                 invalidate()
-            v = w
-            v = v.lower()
+                v = w
+            v = w.lower()
+            #
+            if v not in map(lambda x: x.data['name'], tags):
+                t = Tag(v)
+                tags.append(t)
+            else:
+                t = getTag(v)
+            t.data['songs'].append(l[0])
+            #
             if v in plv.playlists:
                 if l[0] not in plv.playlists[v]:
                     plv.playlists[v] += [l[0]]
@@ -1044,9 +1052,9 @@ def orderSearch(x, res):
             words, negwords = parseCmd(x, 'pn') #differentiate between positive and negative search terms
             filterPN = filterPosNeg(words, negwords)
         if plv.comesFromDirectorySearch or plv.directorySearch:
-            res = list(filter(filterPN, res))
+            res = filter(filterPN, res)
         else:
-            res = sorted(list(filter(filterPN, res)), key=rating, reverse=True)
+            res = sorted(filter(filterPN, res), key=rating, reverse=True)
     printResults(res)
     if x != '':
         plv.cmdLog.append(x)

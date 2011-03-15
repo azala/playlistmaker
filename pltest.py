@@ -1,5 +1,9 @@
 from plutil import *
 
+x = filter(lambda x: x == 1, [1, 2, 3])
+print 1 in x
+
+
 '''
 sd = SongData()
 plv.songs = [sd]
