@@ -26,7 +26,7 @@ class SongData(object):
 def getSongs(attrName, attrValue, songs):
     return filter(lambda x: x.data[attrName] == attrValue, songs)
 
-def getSongByName(name):
+def getSong(name):
     #x = getSongs('fn', name, plv.songs)
     #for s in x:
     #    if 'VACANCY' in s.data['fn']:

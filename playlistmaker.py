@@ -91,7 +91,7 @@ def removeFileFromDirfill(fn):
 def rewriteDirfillIfNeeded():
     if plv.needRewriteDirfill:
         df = open(plv.DIRFILLPATH, 'wb')
-        for l in list(map(lambda x: '\t'.join(x)+'\r\n', plv.dirFillLines)):
+        for l in map(lambda x: '\t'.join(x)+'\r\n', plv.dirFillLines):
             df.write(l.encode('utf-8'))
         df.close()
         plv.needRewriteDirfill = False
@@ -100,7 +100,7 @@ def rewriteDirfillIfNeeded():
 def readRatingData():
     for l in clean(fread(plv.ratingFile)):
         k, v = l.split('\t')
-        getSongByName(k).data['rating'] = int(v)
+        plv.songsByName[k].data['rating'] = int(v)
         plv.ratingdata[k] = int(v)
     print 'Loaded rating data.'
     
@@ -309,23 +309,23 @@ def readtags():
     knownFileNames = []
     invalidateTheseLater = []
     ctr = 0
-    for i in range(len(rawtfLines)-1, -1, -1):
+    for i in range(0, len(rawtfLines)):
         l = rawtfLines[i][:]
-        if l[0] not in plv.lines: #if a filename from tagfile is not in dirfill
-            print 'Filename not in directory?! (bug)'
-            for t in l[1:]:
-                invalidateTheseLater.append(t)
-            tryPrint(l[0],'  ')
-        elif l[0] in knownFileNames: #if a filename from tagfile was listed earlier in plv.tagfile
-            ctr += 1
-            tfLines.append(l)
-            invalidate()
-            print 'Duplicate filename:'
-            tryPrint(l[0],'  ')
-        else:
-            ctr += 1
-            tfLines.append(l)
-            knownFileNames.append(l[0])
+        #if l[0] not in plv.lines: #if a filename from tagfile is not in dirfill
+        #    print 'Filename not in directory?! (bug)'
+        #    for t in l[1:]:
+        #        invalidateTheseLater.append(t)
+        #    tryPrint(l[0],'  ')
+        #elif l[0] in knownFileNames: #if a filename from tagfile was listed earlier in plv.tagfile
+        #    ctr += 1
+        #    tfLines.append(l)
+        #    invalidate()
+        #    print 'Duplicate filename:'
+        #    tryPrint(l[0],'  ')
+        #else:
+        ctr += 1
+        tfLines.append(l)
+        knownFileNames.append(l[0])
     print 'Imported '+str(ctr)+' tagged files.'
     tf.close()
     plv.ptag_index, tag_index = getPriorityTags()
@@ -334,34 +334,33 @@ def readtags():
         print 'Blank tag index file.'
         print 'Generating new playlist order.'
     for l in tfLines:
+        #curSongTags = getSongByName(l[0]).data['tags']
+        curSongTags = plv.songsByName[l[0]].data['tags']
         for v in l[1:]:
             w = getAlias(v, False)
             if v != w:
                 print 'Converting alias "'+v+'" to "'+w+'".'
                 invalidate()
-                v = w
             v = w.lower()
             #
             if v not in map(lambda x: x.data['name'], plv.tags):
                 t = Tag(v)
                 plv.tags.append(t)
+                plv.tagsByName[v] = t
             else:
-                t = getTag(v)
+                t = plv.tagsByName[v]
             t.data['songs'].append(l[0])
-            #
-            if v in plv.playlists:
-                if l[0] not in plv.playlists[v]:
-                    plv.playlists[v] += [l[0]]
-            else:
+            try:
+                plv.playlists[v].append(l[0])
+            except KeyError:
                 plv.playlists[v] = [l[0]]
-                if v not in plv.plkeys:
-                    plv.plkeys.append(v)
-            if l[0] in plv.taglists:
-                if v not in plv.taglists[l[0]]:
-                    plv.taglists[l[0]] += [v]
-            else:
+            if v not in plv.plkeys:
+                plv.plkeys.append(v)
+            try:
+                plv.taglists[l[0]].append(v)
+            except KeyError:
                 plv.taglists[l[0]] = [v]
-            getSongByName(l[0]).data['tags'].append(v)
+            curSongTags.append(v)
     for t in invalidateTheseLater:
         invalidate(t)
     print 'Read tags & playlists.'
@@ -1087,8 +1086,9 @@ def main():
     plv.dirFillLines = dirFillToList()
     for l in plv.dirFillLines:
         sd = SongData()
-        plv.songs.append(sd)
         sd.data['fn'] = l[0]
+        plv.songs.append(sd)
+        plv.songsByName[l[0]] = sd
         plv.lines.append(l[0])
         #use dirfill's filename sort key (index 1)
         sd.data['sk'] = l[1]

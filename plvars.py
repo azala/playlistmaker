@@ -58,6 +58,7 @@ ptag_index = []
 songs = []
 songsByName = {}
 tags = []
+tagsByName = {}
 tag_aliases = {}
 fileNames2sortKeys = {}
 sortKeys2fileNames = {}
