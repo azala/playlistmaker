@@ -48,7 +48,7 @@ def renameFiles(d, maxmatches, ctr):
     basedir = d
     subdirlist = []
     try:
-        listd = listdir(d)
+        listd = os.listdir(d)
     except:
         print 'Couldn\'t open: '+d
         return 0

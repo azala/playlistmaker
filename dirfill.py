@@ -12,7 +12,7 @@ filesAlreadyInList = []
 
 def recurlist(d):
     global ctr, files
-    for f in listdir(d):
+    for f in sorted(listdir(d)): #azutils listdir function that works with unicode strings
         f = os.path.join(d, f)
         if not os.path.isdir(f):
             x = f.rpartition('.')[2].lower()
@@ -32,7 +32,7 @@ dirs = []
 dirCtr = 0
 def findAllDirsIn(d):
     global dirs, dirCtr
-    for f in listdir(d):
+    for f in sorted(listdir(d)):
         f = opj(d, f)
         if os.path.isdir(f) and f not in plv.excludedirs:
             dirCtr += 1

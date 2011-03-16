@@ -180,7 +180,7 @@ def newSearch(newResults):
 def replaceResult(src, dst):
     for rh in plv.resultHistory:
         if dst == plv.DONTWANTPATH:
-            rh = list(filter(lambda x: x != src, rh))
+            rh = filter(lambda x: x != src, rh)
         else:
             for i in range(0, len(rh)):
                 if rh[i] == src:
@@ -251,19 +251,19 @@ def fillTagAliases():
         
 def getPriorityTags():
     inf = open(plv.tag_priorityfile, 'rb')
-    ptags = list(filter(lambda x: x != '', map(lambda x: x.strip().decode('utf-8'), inf.readlines())))
+    ptags = filter(lambda x: x != '', map(lambda x: x.strip().decode('utf-8'), inf.readlines()))
     inf.close()
     inf = open(plv.tag_indexfile, 'rb')
-    tags = list(filter(lambda x: x != '' and x not in ptags, map(lambda x: x.strip().decode('utf-8'), inf.readlines())))
+    tags = filter(lambda x: x != '' and x not in ptags, map(lambda x: x.strip().decode('utf-8'), inf.readlines()))
     inf.close()
     tags.sort()
     return ptags, tags
 
 def plkeysSorted():
     head = plv.ptag_index
-    tail = list(filter(lambda x: x not in plv.ptag_index, plv.plkeys))
+    tail = filter(lambda x: x not in plv.ptag_index, plv.plkeys)
     tail.sort()
-    return list(filter(lambda x: x in plv.playlists, head + tail))
+    return filter(lambda x: x in plv.playlists, head + tail)
 
 def doBackup(buf = ['']):
     try:
@@ -271,7 +271,7 @@ def doBackup(buf = ['']):
     except:
         print 'Invalid input.'
     doE = '-doe' in params
-    filelist = list(filter(lambda x: x.endswith('.txt'), listdir(plv.CDATAPATH)))
+    filelist = filter(lambda x: x.endswith('.txt'), listdir(plv.CDATAPATH))
     curTime = dateTimeStr(time.gmtime())
     fdir = opj(mainBackupDir(), curTime)
     print 'Creating backup in: '+fdir
@@ -303,8 +303,8 @@ def readDirs():
     
 def readtags():
     tf = open(plv.tagfile, 'rb')
-    rawtfLines = list(map(lambda x: x.decode('utf-8').strip().split('\t'), tf.readlines()))
-    #tfLines = list(filter(lambda x: x[0] in lines, tfLines)) #x[0] is filename, lines is dirfill
+    rawtfLines = map(lambda x: x.decode('utf-8').strip().split('\t'), tf.readlines())
+    #tfLines = filter(lambda x: x[0] in lines, tfLines) #x[0] is filename, lines is dirfill
     tfLines = []
     knownFileNames = []
     invalidateTheseLater = []
@@ -396,7 +396,7 @@ def writetags():
     if plv.invalidateAllTags:
         lenplkeys = len(plv.plkeys)
     else:
-        lenplkeys = len(list(filter(lambda x: plv.playlists[x] != [] and x in plv.invalidateTheseTags, plv.plkeys)))
+        lenplkeys = len(filter(lambda x: plv.playlists[x] != [] and x in plv.invalidateTheseTags, plv.plkeys))
 
     for v in plkeysSorted():
         if plv.playlists[v] == []:
@@ -731,9 +731,9 @@ def cmd_newhelper(buf):
         n = 10
     plv.rr = plv.lines
     # exclude albums
-    plv.rr = list(filter(lambda x: '\\+ Albums\\' not in x, plv.rr))
+    plv.rr = filter(lambda x: '\\+ Albums\\' not in x, plv.rr)
     print 'Non-album songs from less than '+str(n)+' days ago:'
-    newr = list(filter(lambda x: fileIsNewAndExists(x, n), plv.rr))
+    newr = filter(lambda x: fileIsNewAndExists(x, n), plv.rr)
     if newr != []:
         plv.orderASpecialSearch = True
         plv.rr = newr[:]
@@ -769,7 +769,7 @@ def ratings_zero_map(x):
     return ratingToString(rating(x))
 
 def cmd_ratings(buf):
-    printResults(list(map(ratings_zero_map, plv.rr)))
+    printResults(map(ratings_zero_map, plv.rr))
 
 def ageBetween(fn, a, b):
     td = fileAge(fn)
@@ -805,10 +805,10 @@ def cmd_time(buf):
     if includeAlbums:
         plv.rr = plv.lines[:]
     else:
-        plv.rr = list(filter(lambda x: plv.ALBUMPATH not in x, plv.lines))
+        plv.rr = filter(lambda x: plv.ALBUMPATH not in x, plv.lines)
     a = datetime.timedelta(days=a)
     b = datetime.timedelta(days=b)
-    plv.rr = list(filter(lambda x: ageBetween(x, a, b), plv.rr))
+    plv.rr = filter(lambda x: ageBetween(x, a, b), plv.rr)
     plv.orderASpecialSearch = True
     addMacro('/p')
     
@@ -821,7 +821,7 @@ def cmd_save(buf):
         print 'Invalid input.'
         return
     dst = opj(plv.SAVEDPLAYLISTPATH, inputl[0])+plv.plExt
-    writePls(dst, list(filter(fnFilter_nonSet, plv.rr)), True)
+    writePls(dst, filter(fnFilter_nonSet, plv.rr), True)
     print 'Saved playlist to: '+dst
     
 def fnFilter_ratingOverN(fn, n):
@@ -839,7 +839,7 @@ def cmd_over(buf):
     except ValueError:
         n = 1
     print 'Playing songs with rating >= '+str(n)
-    plv.rr = list(filter(lambda x: fnFilter_ratingOverN(x, n), plv.lines))
+    plv.rr = filter(lambda x: fnFilter_ratingOverN(x, n), plv.lines)
     plv.orderASpecialSearch = True
     
 def cmd_cfds(buf):
@@ -884,7 +884,7 @@ def canRefine():
 
 def getSearchWords(x):
     x = x.replace(r'\ ', spaceHolderString)
-    return list(map(lambda y: y.strip().replace(spaceHolderString, ' '), x.split(' ')))
+    return map(lambda y: y.strip().replace(spaceHolderString, ' '), x.split(' '))
 
 def parseCmdHelper(s, *flags):
     inQuote = False
@@ -952,7 +952,7 @@ def parseCmd(s, *flags):
 
 #parsing within-list numerical selections
 def parseSelect(s, mini, maxi):
-    ranges = list(map(lambda x: x.strip(), s.split(',')))
+    ranges = map(lambda x: x.strip(), s.split(','))
     ret = []
     ctr = 0
     for ran in ranges:
@@ -984,7 +984,7 @@ def parseSelect(s, mini, maxi):
                     ret += range(lb, ub)
                 else:
                     y = range(lb, ub)
-                    ret = list(filter(lambda x: x not in y, ret))
+                    ret = filter(lambda x: x not in y, ret)
         except:
             print 'Bad selection.'
             ret = []
