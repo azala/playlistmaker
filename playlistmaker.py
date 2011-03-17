@@ -206,7 +206,7 @@ def traverseCmd(s, parity):
             print 'Moved '+ba_string+' '+str(s)+' searches.'
             plv.directorySearch = plv.resultHistory_DSFlag[plv.rptr]
             #plv.nosort = plv.resultHistory_NoSortFlag[rptr]
-            printResults(readRes())
+            printResults(mapSongsToNames(readRes()))
         else:
             print 'Couldn\'t move '+ba_string+' '+str(s)+' searches.'
     except:
@@ -299,7 +299,7 @@ def doBackup(buf = ['']):
     print 'Done.'
 
 def readDirs():
-    plv.dirlist = clean(fread(plv.albumfile))
+    plv.dirlist = map(DirData, clean(fread(plv.albumfile)))
     
 def readtags():
     tf = open(plv.tagfile, 'rb')
@@ -469,7 +469,8 @@ def cmd_tag(buf):
     #plv.rr = readRes()
     invalidatedAlready = False
     ctr = 0
-    for r in rrhelper:
+    for song in rrhelper:
+        r = song.data['fn']
         plv.didAnything = True
         if t in plv.playlists:
             if r not in plv.playlists[t]:
@@ -542,17 +543,17 @@ def cmd_p(buf):
         plv.continueFlag = True
         return
     if playAll and plv.lenrr > 0 and not plv.directorySearch:
-        if playFiles(plv.rr, not nosortFlag):
+        if playSongs(plv.rr, not nosortFlag):
             print 'Playing files.'
         else:
             print 'Could not play files.'
     elif num < plv.lenrr and num >= 0:
         if plv.directorySearch:
-            addMacro('/ds;/cfds on;"'+plv.rr[num]+'";/cfds off;/p --nosort')
+            addMacro('/ds;/cfds on;"'+plv.rr[num].data['fn']+'";/cfds off;/p --nosort')
             plv.continueFlag = True
             return
-        if playFile(plv.rr[num], not nosortFlag):
-            print 'Playing file '+plv.rr[num]
+        if playSong(plv.rr[num], not nosortFlag):
+            print 'Playing file '+plv.rr[num].data['fn']
         else:
             print 'Could not play file.'
     else:
@@ -563,8 +564,9 @@ def cmd_dates(buf):
         print 'Nothing in selection.'
     ctr = 1
     for r in plv.rr:
-        if r in plv.fileNames2Dates:
-            s = dateTimeStr(plv.fileNames2Dates[r])
+        s = plv.rr.data['mtime']
+        if s != plv.cZeroTime:
+            s = dateTimeStr(s)
         else:
             s = ''
         print bracketNum(ctr) + s
@@ -584,10 +586,10 @@ def cmd_dir(buf):
         print 'Bad index: '+buf[0]+'\r\nDefaulting to first element.'
         n = 0
     if plv.directorySearch:
-        os.system('explorer "'+plv.rr[n]+'"')
+        os.system('explorer "'+plv.rr[n].data['fn']+'"')
         print 'Showing directory.'
     else:
-        os.system('explorer "'+plv.rr[n].rpartition('\\')[0]+'"')
+        os.system('explorer "'+plv.rr[n].data['fn'].rpartition('\\')[0]+'"')
         print 'Showing parent directory.'
 
 def cmd_rn(buf):
@@ -622,9 +624,9 @@ def cmd_move(buf):
         print 'You need exactly 1 argument (destination file) to move.'
         plv.continueFlag = True
         return
-    src = plv.rr[0]
-    tempDir = plv.rr[0].rpartition('\\')[0] + '\\'
-    tempExt = '.' + plv.rr[0].rpartition('.')[2]
+    src = plv.rr[0].data['fn']
+    tempDir = src.rpartition('\\')[0] + '\\'
+    tempExt = '.' + src.rpartition('.')[2]
     dst = tempDir + shortDst[0] + tempExt
     moveFile(src, dst)
 
@@ -638,14 +640,15 @@ def cmd_fmove(buf):
         print 'You need exactly 1 argument (destination directory) to move.'
         plv.continueFlag = True
         return
-    src = plv.rr[0]
-    x = plv.rr[0].rpartition('\\')
+    src = plv.rr[0].data['fn']
+    x = src.rpartition('\\')
     tempDir = plv.GENRESPLITPATH+'\\'+shortDst[0]
     dst = tempDir+'\\'+x[2]
     moveFile(src, dst)
     
 def cmd_banish(buf):
-    for fn in plv.rr:
+    for song in plv.rr:
+        fn = song.data['fn']
         banishFile(fn)
     print 'Banished '+str(plv.lenrr)+' files.'
 
@@ -658,7 +661,8 @@ def cmd_rm(buf):
     else:
         invalidate(s)
         ctr = 0
-        for fn in plv.rr:
+        for song in plv.rr:
+            fn = song.data['fn']
             if fn in plv.taglists and s in plv.taglists[fn]:
                 plv.taglists[fn].remove(s)
                 plv.playlists[s].remove(fn)
@@ -677,7 +681,7 @@ def cmd_show(buf):
         print 'Tag doesn\'t exist.'
     else:
         plv.orderASpecialSearch = True
-        plv.rr = plv.playlists[s][:]
+        plv.rr = map(lambda x: plv.songDict['fn'][x], plv.playlists[s])
 
 def cmd_fwd(buf):
     traverseCmd(buf[0], 1)
@@ -693,7 +697,8 @@ def cmd_tags(buf):
     if plv.rr != []:
         for r in plv.rr:
             ctr += 1
-            s = tagsAsString(r)
+            #s = tagsAsString(r)
+            s = tagListToString(r.data['tags'])
             print bracketNum(ctr) + s
     else:
         print 'Nothing in selection.'
@@ -731,9 +736,9 @@ def cmd_newhelper(buf):
         n = 10
     plv.rr = plv.lines
     # exclude albums
-    plv.rr = filter(lambda x: '\\+ Albums\\' not in x, plv.rr)
+    plv.rr = filter(lambda x: '\\+ Albums\\' not in x.data['fn'], plv.rr)
     print 'Non-album songs from less than '+str(n)+' days ago:'
-    newr = filter(lambda x: fileIsNewAndExists(x, n), plv.rr)
+    newr = filter(lambda x: fileIsNewAndExists(x, n), plv.rr.data['fn'])
     if newr != []:
         plv.orderASpecialSearch = True
         plv.rr = newr[:]
@@ -757,19 +762,19 @@ def cmd_rating(buf):
         return
     for r in pickList:
         #key = plv.fileNames2sortKeys[r]
-        key = r
-        if key in plv.ratingdata:
-            print r+': changed from '+str(plv.ratingdata[key])+' to '+str(n)+'.'
+        oldrating = r.data['rating']
+        if oldrating != 0:
+            print r+': changed from '+str(oldrating)+' to '+str(n)+'.'
         else:
             print r+': new rating '+str(n)+'.'
-        plv.ratingdata[key] = n
+        #plv.ratingdata[key] = n
         plv.ratingdataChanged = True
 
 def ratings_zero_map(x):
     return ratingToString(rating(x))
 
 def cmd_ratings(buf):
-    printResults(map(ratings_zero_map, plv.rr))
+    printResults(map(ratings_zero_map, plv.rr), True)
 
 def ageBetween(fn, a, b):
     td = fileAge(fn)
@@ -785,7 +790,7 @@ def cmd_time(buf):
             includeAlbums = True
             inputl = inputl[1:]
         if len(inputl) == 0:
-            a = fileAge(plv.rr[0]).days - default_time_const/2
+            a = fileAge(plv.rr[0].data['fn']).days - default_time_const/2
             b = a + default_time_const
             print 'Defaulting to age of first result file.'
         else:
@@ -805,17 +810,18 @@ def cmd_time(buf):
     if includeAlbums:
         plv.rr = plv.lines[:]
     else:
-        plv.rr = filter(lambda x: plv.ALBUMPATH not in x, plv.lines)
+        plv.rr = filter(lambda x: plv.ALBUMPATH not in x.data['fn'], plv.lines)
     a = datetime.timedelta(days=a)
     b = datetime.timedelta(days=b)
-    plv.rr = filter(lambda x: ageBetween(x, a, b), plv.rr)
+    plv.rr = filter(lambda x: ageBetween(x.data['fn'], a, b), plv.rr)
     plv.orderASpecialSearch = True
     addMacro('/p')
     
-def fnFilter_nonSet(fn):
-    return not fn.startswith(plv.SETPATH)
+def fnFilter_nonSet(song):
+    return not song.data['fn'].startswith(plv.SETPATH)
 
 def cmd_save(buf):
+    #excludes sets from result
     inputl = parseCmd(buf[0])
     if len(inputl) == 0 or inputl[0].strip() == '':
         print 'Invalid input.'
@@ -824,9 +830,9 @@ def cmd_save(buf):
     writePls(dst, filter(fnFilter_nonSet, plv.rr), True)
     print 'Saved playlist to: '+dst
     
-def fnFilter_ratingOverN(fn, n):
+def fnFilter_ratingOverN(song, n):
     #k = plv.fileNames2sortKeys[fn]
-    k = fn
+    k = song.data['fn']
     if k in plv.ratingdata:
         r = plv.ratingdata[k]
     else:
@@ -1041,7 +1047,7 @@ def stringContainsPosNotNeg(s, pos, neg):
     return True
 
 def filterPosNeg(pos, neg):
-    return lambda x: stringContainsPosNotNeg(x, pos, neg)
+    return lambda x: stringContainsPosNotNeg(x.data['fn'], pos, neg)
 
 def orderSearch(x, res):
     if res != []:
@@ -1054,18 +1060,13 @@ def orderSearch(x, res):
             res = filter(filterPN, res)
         else:
             res = sorted(filter(filterPN, res), key=rating, reverse=True)
-    printResults(res)
+    printResults(mapSongsToNames(res))
     if x != '':
         plv.cmdLog.append(x)
     return res
 
-def rating(fn):
-    #sk = plv.fileNames2sortKeys[fn]
-    sk = fn
-    try:
-        return plv.ratingdata[sk]
-    except KeyError:
-        return 0
+def rating(song):
+    sk = song.data['rating']
                                                 
 def grabInput(cq):
     notfirst = True
@@ -1087,7 +1088,8 @@ def main():
                      'sk':{}}
     plv.dirFillLines = dirFillToList()
     timelist = [time.clock()]
-    plv.lines = map(lambda x: x[0], plv.dirFillLines)
+    #plv.lines = map(lambda x: x[0], plv.dirFillLines)
+    plv.lines = plv.songs
     for l in plv.dirFillLines:
         sd = SongData(l[0], l[1])
         plv.songs.append(sd)
@@ -1188,7 +1190,7 @@ def main():
             if plv.rr != []:
                 ps = parseSelect(sele, 1, plv.lenrr)
                 if plv.directorySearch and len(ps) == 1:
-                    addMacro('/ds;/cfds on;"'+plv.rr[ps[0]]+'";/cfds off')
+                    addMacro('/ds;/cfds on;"'+plv.rr[ps[0]].data['fn']+'";/cfds off')
                     continue
                 elif ps != []:
                     plv.orderASpecialSearch = True

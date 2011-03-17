@@ -15,8 +15,12 @@ def getTag(name):
     return next((tag for tag in plv.tags if tag.data['name'] == name), None)
     #return filter(lambda x: x.data['name'] == name, plv.tags)[0]
 
+class DirData(object):
+    def __init__(self, fn):
+        self.data = {'fn' : fn }
+
 class SongData(object):
-    def __init__(self, fn, sk = '', rating = 0, tags = [], mtime = time.gmtime(0)):
+    def __init__(self, fn, sk = '', rating = 0, tags = [], mtime = plv.cZeroTime):
         self.data = {'fn' : fn,
                      'sk' : sk,
                      'rating' : rating,
@@ -93,15 +97,17 @@ def dirFillToList():
 def dataToDirFillLine(l):
     return ('\t'.join(l)+'\r\n').encode('utf-8')
 
+def mapSongsToNames(l):
+    return map(lambda x: x.data['fn'], l)
+
 def writePls(fn, songlist, sort):
     if sort:
-        sl = sorted(songlist, key=lambda x: plv.fileNames2sortKeys[x])
+        songlist = sorted(songlist, key=lambda x: x.data['sk'])
     else:
         print 'Not sorting this playlist.'
-        #sl = sorted(songlist)
-        sl = songlist
-    sl = unclean(sl)
-    fwrite(sl, fn)
+    songNames = map(lambda x: x.data['fn'], songlist)
+    songNames = unclean(songNames)
+    fwrite(songNames, fn)
     
 def replaceDirFillEntry(mfqEntries):
     if mfqEntries == []:
@@ -147,7 +153,7 @@ def needAutoBackup(bdir = mainBackupDir()):
     #print b-a, 'since last backup.' (I might want this later)
     return b - a >= datetime.timedelta(days=plv.AUTOBACKUP_INTERVAL)
     
-def playFiles(files, sort = True):
+def playSongs(files, sort = True):
     try:
         writePls(plv.LASTPLSPATH, files, sort)
         subprocess.Popen([plv.mediaplayer, plv.LASTPLSPATH])
@@ -155,8 +161,8 @@ def playFiles(files, sort = True):
     except:
         return False
 
-def playFile(fn, sort = True):
-    return playFiles([fn], sort)
+def playSong(fn, sort = True):
+    return playSongs([fn], sort)
 
 def addMacro(s):
     plv.cmdQueue = doubleSlash(s).split(';') + plv.cmdQueue
