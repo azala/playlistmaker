@@ -56,6 +56,7 @@ results = []
 cmdQueue = []
 ptag_index = []
 songs = []
+songsDict = {}
 songsByName = {}
 tags = []
 tagsByName = {}

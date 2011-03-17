@@ -127,8 +127,7 @@ def needAutoBackup(bdir = mainBackupDir()):
     latest = max(d)
     a = invTimetuple(latest)
     b = invTimetuple(time.gmtime())
-    if False: #I might want this later
-        print b-a, 'since last backup.'
+    #print b-a, 'since last backup.' (I might want this later)
     return b - a >= datetime.timedelta(days=plv.AUTOBACKUP_INTERVAL)
     
 def playFiles(files, sort = True):

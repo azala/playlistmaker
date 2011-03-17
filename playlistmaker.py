@@ -1083,21 +1083,28 @@ def main():
         print plv.ROOTDIR+' doesn\'t exist, aborting.'
         raw_input()
         return
+    plv.songsDict = {'fn':{},
+                     'sk':{}}
     plv.dirFillLines = dirFillToList()
+    #timelist = [time.clock()]
+    plv.lines = map(lambda x: x[0], plv.dirFillLines)
     for l in plv.dirFillLines:
         sd = SongData()
         sd.data['fn'] = l[0]
         plv.songs.append(sd)
         plv.songsByName[l[0]] = sd
-        plv.lines.append(l[0])
         #use dirfill's filename sort key (index 1)
         sd.data['sk'] = l[1]
         plv.fileNames2sortKeys[l[0]] = l[1]
         #use dirfill's creation date if available (index 2)
         if len(l) >= 3:
-            sd.data['mtime'] = invDateTimeStr(l[2])
-            plv.fileNames2Dates[l[0]] = invDateTimeStr(l[2])        
+            td = invDateTimeStr(l[2])
+            sd.data['mtime'] = td
+            plv.fileNames2Dates[l[0]] = td
     plv.sortKeys2fileNames = dict((v,k) for (k,v) in plv.fileNames2sortKeys.items())
+    #print '%0.2f\n%0.2f\n%0.2f' % (A,B,C)
+    #timelist += [time.clock()]
+    #print timelist
     readRatingData()
     fillTagAliases()
     readtags()
