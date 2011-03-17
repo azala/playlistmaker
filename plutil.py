@@ -16,13 +16,30 @@ def getTag(name):
     #return filter(lambda x: x.data['name'] == name, plv.tags)[0]
 
 class SongData(object):
-    def __init__(self, fn = '', sk = '', rating = 0, tags = [], mtime = time.gmtime(0)):
+    def __init__(self, fn, sk = '', rating = 0, tags = [], mtime = time.gmtime(0)):
         self.data = {'fn' : fn,
                      'sk' : sk,
                      'rating' : rating,
                      'tags' : tags,
                      'mtime' : mtime}
-        
+        self.updateName(fn)
+        if sk != '':
+            self.updateKey(sk)
+    def updateNameOrKey(self, news, s):
+        olds = self.data[s]
+        if olds in plv.songDict[s]:
+            if olds != news:
+                plv.songDict[s][news] = plv.songDict[s][olds]
+                del plv.songDict[s][olds]
+                self.data[s] = news
+        else:
+            plv.songDict[s][news] = self
+            self.data[s] = news
+    def updateName(self, fn):
+        self.updateNameOrKey(fn, 'fn')
+    def updateKey(self, sk):
+        self.updateNameOrKey(sk, 'sk')
+            
 def getSongs(attrName, attrValue, songs):
     return filter(lambda x: x.data[attrName] == attrValue, songs)
 

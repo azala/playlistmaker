@@ -100,7 +100,7 @@ def rewriteDirfillIfNeeded():
 def readRatingData():
     for l in clean(fread(plv.ratingFile)):
         k, v = l.split('\t')
-        plv.songsByName[k].data['rating'] = int(v)
+        plv.songDict['fn'][k].data['rating'] = int(v)
         plv.ratingdata[k] = int(v)
     print 'Loaded rating data.'
     
@@ -335,7 +335,7 @@ def readtags():
         print 'Generating new playlist order.'
     for l in tfLines:
         #curSongTags = getSongByName(l[0]).data['tags']
-        curSongTags = plv.songsByName[l[0]].data['tags']
+        curSongTags = plv.songDict['fn'][l[0]].data['tags']
         for v in l[1:]:
             w = getAlias(v, False)
             if v != w:
@@ -1083,18 +1083,15 @@ def main():
         print plv.ROOTDIR+' doesn\'t exist, aborting.'
         raw_input()
         return
-    plv.songsDict = {'fn':{},
+    plv.songDict = {'fn':{},
                      'sk':{}}
     plv.dirFillLines = dirFillToList()
-    #timelist = [time.clock()]
+    timelist = [time.clock()]
     plv.lines = map(lambda x: x[0], plv.dirFillLines)
     for l in plv.dirFillLines:
-        sd = SongData()
-        sd.data['fn'] = l[0]
+        sd = SongData(l[0], l[1])
         plv.songs.append(sd)
-        plv.songsByName[l[0]] = sd
         #use dirfill's filename sort key (index 1)
-        sd.data['sk'] = l[1]
         plv.fileNames2sortKeys[l[0]] = l[1]
         #use dirfill's creation date if available (index 2)
         if len(l) >= 3:
