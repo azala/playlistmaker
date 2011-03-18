@@ -158,7 +158,7 @@ def moveFile(src, dst, banish = False):
                 break
         if not replacedDst:
             plv.move_file_queue.append([src, srcKey, dst, dstKey])
-            print 'Moved "'+src.rpartition('\\')[2]+'" to "'+dst.rpartition('\\')[2]+'".'
+            print 'Moved "'+os.path.basename(src)+'" to "'+os.path.basename(dst)+'".'
 
 def applyMoveFileQueue():
     replaceDirFillEntry(plv.move_file_queue)
@@ -361,6 +361,16 @@ def readtags():
     for t in invalidateTheseLater:
         invalidate(t)
     print 'Read tags & playlists.'
+
+def readLocalSongs():
+    locals = clean(fread(plv.localDirfillFile))
+    locals = {os.path.basename(fn).lower():fn for fn in locals}
+    #for l in locals:
+    #    print l, locals[l]
+    for s in plv.songs:
+        shortName = os.path.basename(s.data['fn']).lower()
+        if shortName in locals:
+            s.data['locals'].append(locals[shortName])
 
 #stuff you might search for:
 #doWrite, writeout
@@ -587,7 +597,7 @@ def cmd_dir(buf):
         os.system('explorer "'+plv.rr[n].data['fn']+'"')
         print 'Showing directory.'
     else:
-        os.system('explorer "'+plv.rr[n].data['fn'].rpartition('\\')[0]+'"')
+        os.system('explorer "'+os.path.dirname(plv.rr[n].data['fn'])+'"')
         print 'Showing parent directory.'
 
 def cmd_rn(buf):
@@ -623,8 +633,8 @@ def cmd_move(buf):
         plv.continueFlag = True
         return
     src = plv.rr[0].data['fn']
-    tempDir = src.rpartition('\\')[0] + '\\'
-    tempExt = '.' + src.rpartition('.')[2]
+    tempDir = os.path.dirname(src) + '\\'
+    tempExt = src[src.rfind('.'):]
     dst = tempDir + shortDst[0] + tempExt
     moveFile(src, dst)
 
@@ -639,9 +649,9 @@ def cmd_fmove(buf):
         plv.continueFlag = True
         return
     src = plv.rr[0].data['fn']
-    x = src.rpartition('\\')
-    tempDir = plv.GENRESPLITPATH+'\\'+shortDst[0]
-    dst = tempDir+'\\'+x[2]
+    x = os.path.split(src)
+    tempDir = opj(plv.GENRESPLITPATH, shortDst[0])
+    dst = opj(tempDir, x[1])
     moveFile(src, dst)
     
 def cmd_banish(buf):
@@ -1077,7 +1087,7 @@ def main():
         raw_input()
         return
     plv.songDict = {'fn':{},
-                     'sk':{}}
+                    'sk':{},}
     plv.dirFillLines = dirFillToList()
     timelist = [time.clock()]
     #plv.lines = map(lambda x: x[0], plv.dirFillLines)
@@ -1100,6 +1110,7 @@ def main():
     fillTagAliases()
     readtags()
     readDirs()
+    readLocalSongs()
     
     if len(sys.argv) > 1 and sys.argv[1] == '-menu':
         argv = sys.argv[0:1]

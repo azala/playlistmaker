@@ -14,23 +14,27 @@ def init():
     dirs = []
     dirCtr = 0
 
-def recurlist(d):
+def recurlist(d, basicInfo=False):
     global ctr, files
     for f in sorted(listdir(d)): #azutils listdir function that works with unicode strings
         f = os.path.join(d, f)
         if not os.path.isdir(f):
             x = f.rpartition('.')[2].lower()
             if x in plv.extns and f not in filesAlreadyInList:
-                files.append(dataToDirFillLine([f,
-                                                pathToFileNameKey(f),
-                                                dateTimeStr(time.gmtime(os.path.getctime(f))),
-                                                ]))
+                if basicInfo:
+                    datalist = [f]
+                else:
+                    datalist = [f,
+                                pathToFileNameKey(f),
+                                dateTimeStr(time.gmtime(os.path.getctime(f))),
+                                ]
+                files.append(dataToDirFillLine(datalist))
                 ctr += 1
                 if ctr % 500 == 0:
                     print ctr
         else:
             if f not in plv.excludedirs:
-                recurlist(f)
+                recurlist(f, basicInfo)
 
 def findAllDirsIn(d):
     global dirs, dirCtr
@@ -45,7 +49,7 @@ def findAllDirsIn(d):
             
 def writeSongLines(path, type):
     global ctr, files
-    print '\n'+str(ctr)+' new entries found.\nSaving '+os.path.split()[1]+'...'
+    print '\n'+str(ctr)+' new entries found.\nSaving '+os.path.basename(path)+'...'
     out = open(path, type)
     out.writelines(files)
     out.close()
@@ -66,7 +70,7 @@ def main():
         recurlist(plv.ROOTDIR)
         writeSongLines(plv.DIRFILLPATH, 'wb')
         init()
-        recurlist(plv.LOCALSONGSPATH)
+        recurlist(plv.LOCALSONGSPATH, basicInfo=True)
         writeSongLines(plv.localDirfillFile, 'wb')
     os.system('python2.7 redo_tags.py '+' '.join(sys.argv[1:]))
     waitAtEnd()

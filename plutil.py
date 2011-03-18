@@ -25,7 +25,8 @@ class SongData(object):
                      'sk' : sk,
                      'rating' : rating,
                      'tags' : tags,
-                     'mtime' : mtime}
+                     'mtime' : mtime,
+                     'locals' : []}
         self.updateName(fn)
         if sk != '':
             self.updateKey(sk)
@@ -65,7 +66,7 @@ def findFirstAlpha(s):
     return -1
 
 def pathToFileNameKey(p):
-    x = p.rpartition('\\')[2].lower()
+    x = os.path.basename(p).lower()
     a = findFirstAlpha(x)
     if a != -1:
         x = x[a:]
@@ -75,7 +76,7 @@ def pathToFileNameKey(p):
 def shortNameToFullDict(l):
     ret = {}
     for fn in l:
-        k = fn.rpartition('\\')[2].lower()
+        k = os.path.basename(fn).lower()
         if k in ret:
             ret[k].append(fn)
         else:
@@ -100,13 +101,27 @@ def dataToDirFillLine(l):
 def mapSongsToNames(l):
     return map(lambda x: x.data['fn'], l)
 
-def writePls(fn, songlist, sort):
+def getLocalCopy(song, ctr):
+    x = song.data['locals']
+    if x == []:
+        return song.data['fn']
+    else:
+        ctr[0] += 1
+        return x[0]
+
+def writePls(fn, songlist, sort, localFlag=False):
     if sort:
         songlist = sorted(songlist, key=lambda x: x.data['sk'])
     else:
         print 'Not sorting this playlist.'
-    songNames = unclean(map(lambda x: x.data['fn'], songlist))
+    localCtr = [0]
+    if localFlag:
+        func = lambda x: getLocalCopy(x, localCtr)
+    else:
+        func = lambda x: x.data['fn']
+    songNames = unclean(map(func, songlist))
     fwrite(songNames, fn)
+    return localCtr[0]
     
 def replaceDirFillEntry(mfqEntries):
     if mfqEntries == []:
@@ -152,9 +167,10 @@ def needAutoBackup(bdir = mainBackupDir()):
     #print b-a, 'since last backup.' (I might want this later)
     return b - a >= datetime.timedelta(days=plv.AUTOBACKUP_INTERVAL)
     
-def playSongs(files, sort = True):
+def playSongs(songs, sort = True):
     try:
-        writePls(plv.LASTPLSPATH, files, sort)
+        localCtr = writePls(plv.LASTPLSPATH, songs, sort, localFlag=True)
+        print str(localCtr)+' local files used.'
         subprocess.Popen([plv.mediaplayer, plv.LASTPLSPATH])
         return True
     except:
