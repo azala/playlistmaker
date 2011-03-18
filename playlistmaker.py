@@ -212,9 +212,6 @@ def traverseCmd(s, parity):
     except:
         print 'Bad argument.'
 
-def writeRes(x):
-    plv.resultHistory[plv.rptr] = x
-
 def readRes():
     if plv.rptr == -1:
         return []
@@ -333,9 +330,9 @@ def readtags():
     if plv.plkeys == []:
         print 'Blank tag index file.'
         print 'Generating new playlist order.'
+    FIRST = True
     for l in tfLines:
-        #curSongTags = getSongByName(l[0]).data['tags']
-        curSongTags = plv.songDict['fn'][l[0]].data['tags']
+        curSongTags = plv.songDict['fn'][l[0]].data['tags'] = []
         for v in l[1:]:
             w = getAlias(v, False)
             if v != w:
@@ -415,7 +412,8 @@ def writetags():
     tif.close()
     #write rating data
     if plv.ratingdataChanged:
-        fwrite(unclean([k+'\t'+str(plv.ratingdata[k]) for k in plv.ratingdata]), plv.ratingFile)
+        rdlist = filter(lambda x: x.data['rating'] != 0, plv.lines)
+        fwrite(unclean([song.data['fn']+'\t'+str(song.data['rating']) for song in rdlist]), plv.ratingFile)
         print 'Wrote rating data.'
     plv.ratingdataChanged = False
     print 'Done writing.'
@@ -761,20 +759,20 @@ def cmd_rating(buf):
         print 'Invalid input.'
         return
     for r in pickList:
-        #key = plv.fileNames2sortKeys[r]
         oldrating = r.data['rating']
+        name = r.data['fn']
         if oldrating != 0:
-            print r+': changed from '+str(oldrating)+' to '+str(n)+'.'
+            print name+': changed from '+str(oldrating)+' to '+str(n)+'.'
         else:
-            print r+': new rating '+str(n)+'.'
-        #plv.ratingdata[key] = n
+            print name+': new rating '+str(n)+'.'
+        r.data['rating'] = n
         plv.ratingdataChanged = True
 
 def ratings_zero_map(x):
     return ratingToString(rating(x))
 
 def cmd_ratings(buf):
-    printResults(map(ratings_zero_map, plv.rr), True)
+    printResults(map(ratings_zero_map, plv.rr))
 
 def ageBetween(fn, a, b):
     td = fileAge(fn)
@@ -831,13 +829,7 @@ def cmd_save(buf):
     print 'Saved playlist to: '+dst
     
 def fnFilter_ratingOverN(song, n):
-    #k = plv.fileNames2sortKeys[fn]
-    k = song.data['fn']
-    if k in plv.ratingdata:
-        r = plv.ratingdata[k]
-    else:
-        r = 0
-    return r >= n
+    return song.data['rating'] >= n
 
 def cmd_over(buf):
     try:
@@ -1066,7 +1058,7 @@ def orderSearch(x, res):
     return res
 
 def rating(song):
-    sk = song.data['rating']
+    return song.data['rating']
                                                 
 def grabInput(cq):
     notfirst = True

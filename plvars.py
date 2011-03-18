@@ -14,6 +14,7 @@ LASTPLSPATH = opj(CDATAPATH, 'last')+plExt
 BACKUPDIRS = [CDATAPATH, opj(ROOTDIR, 'backups')]
 SAVEDPLAYLISTPATH = opj(ROOTDIR, 'saved playlists')
 SETPATH = opj(GENRESPLITPATH, '+ sets')
+LOCALSONGSPATH = r'C:\Documents and Settings\Michel DSa\Desktop\+ ALREADY ON IPOD'
 
 preprocess_file = opj(CDATAPATH, 'preprocess.txt')
 tagfile = opj(CDATAPATH, 'tags.txt')
@@ -25,6 +26,7 @@ albumfile = opj(CDATAPATH, 'albums.txt')
 cmdLogFile = opj(CDATAPATH, 'searchlog.txt')
 cmdListFile = opj(CDATAPATH, 'commandlist.txt')
 ratingFile = opj(CDATAPATH, 'ratings.txt')
+localDirfillFile = opj(CDATAPATH, 'local-dirfill.txt')
 
 mediaplayer = 'winamp'
 notepad = 'notepad++'

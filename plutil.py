@@ -105,8 +105,7 @@ def writePls(fn, songlist, sort):
         songlist = sorted(songlist, key=lambda x: x.data['sk'])
     else:
         print 'Not sorting this playlist.'
-    songNames = map(lambda x: x.data['fn'], songlist)
-    songNames = unclean(songNames)
+    songNames = unclean(map(lambda x: x.data['fn'], songlist))
     fwrite(songNames, fn)
     
 def replaceDirFillEntry(mfqEntries):

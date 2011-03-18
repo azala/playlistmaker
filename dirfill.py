@@ -6,9 +6,13 @@ if not os.path.exists(plv.ROOTDIR):
     print 'Not found: '+plv.ROOTDIR
     sys.exit(0)
 
-ctr = 0
-files = []
-filesAlreadyInList = []
+def init():
+    global ctr, files, filesAlreadyInList, dirs, dirCtr
+    ctr = 0
+    files = []
+    filesAlreadyInList = []
+    dirs = []
+    dirCtr = 0
 
 def recurlist(d):
     global ctr, files
@@ -28,8 +32,6 @@ def recurlist(d):
             if f not in plv.excludedirs:
                 recurlist(f)
 
-dirs = []
-dirCtr = 0
 def findAllDirsIn(d):
     global dirs, dirCtr
     for f in sorted(listdir(d)):
@@ -40,29 +42,35 @@ def findAllDirsIn(d):
             if dirCtr % 20 == 0:
                 print dirCtr
             findAllDirsIn(f)
-
-if '-a' in sys.argv:
-    findAllDirsIn(plv.ROOTDIR)
-    print '\n'+str(dirCtr)+' directories found.\nSaving albums.txt...'
-    fwrite(dirs, plv.albumfile)
-if '-n' in sys.argv:
-    l = dirFillToList()
-    filesAlreadyInList = list(map(lambda x: x[0], l))
-    recurlist(plv.NEWESTPATH)
-    print '\n'+str(ctr)+' new entries found.\nSaving dirfill.txt...'
-    out = open(plv.DIRFILLPATH, 'ab')
-    out.writelines(files)
-    out.close()
-else:
-    d = plv.ROOTDIR
-    recurlist(d)
-    print '\n'+str(ctr)+' entries found.\nSaving dirfill.txt...'
-    out = open(plv.DIRFILLPATH, 'wb')
+            
+def writeSongLines(path, type):
+    global ctr, files
+    print '\n'+str(ctr)+' new entries found.\nSaving '+os.path.split()[1]+'...'
+    out = open(path, type)
     out.writelines(files)
     out.close()
 
-#subprocess.call(['python2.7', 'redo_tags.py']+sys.argv[1:])
-os.system('python2.7 redo_tags.py '+' '.join(sys.argv[1:]))
+def main():
+    global ctr, files, filesAlreadyInList, dirs, dirCtr
+    init()
+    if '-a' in sys.argv:
+        findAllDirsIn(plv.ROOTDIR)
+        print '\n'+str(dirCtr)+' directories found.\nSaving albums.txt...'
+        fwrite(dirs, plv.albumfile)
+    if '-n' in sys.argv:
+        l = dirFillToList()
+        filesAlreadyInList = list(map(lambda x: x[0], l))
+        recurlist(plv.NEWESTPATH)
+        writeSongLines(plv.DIRFILLPATH, 'ab')
+    else:
+        recurlist(plv.ROOTDIR)
+        writeSongLines(plv.DIRFILLPATH, 'wb')
+        init()
+        recurlist(plv.LOCALSONGSPATH)
+        writeSongLines(plv.localDirfillFile, 'wb')
+    os.system('python2.7 redo_tags.py '+' '.join(sys.argv[1:]))
+    waitAtEnd()
 
-waitAtEnd()
+if __name__ == '__main__':
+    main()
 
