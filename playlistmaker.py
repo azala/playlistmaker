@@ -247,12 +247,12 @@ def fillTagAliases():
             plv.tag_aliases[k] = line[0]
         
 def getPriorityTags():
-    inf = open(plv.tag_priorityfile, 'rb')
-    ptags = filter(lambda x: x != '', map(lambda x: x.strip().decode('utf-8'), inf.readlines()))
-    inf.close()
-    inf = open(plv.tag_indexfile, 'rb')
-    tags = filter(lambda x: x != '' and x not in ptags, map(lambda x: x.strip().decode('utf-8'), inf.readlines()))
-    inf.close()
+    ptags = filter(lambda x: x != '', clean(fread(plv.tag_priorityfile)))
+    tagsAndPlaylists = readToSplitList(plv.tag_indexfile)
+    plv.tagToPlaylist = {x[0]:x[1] for x in tagsAndPlaylists}
+    if '' in plv.tagToPlaylist:
+        del plv.tagToPlaylist['']
+    tags = filter(lambda x: x != '' and x not in ptags, plv.tagToPlaylist.keys())
     tags.sort()
     return ptags, tags
 
@@ -397,27 +397,27 @@ def writetags():
     if plv.invalidateAllTags:
         wipePlaylists()
     ctr = 0
-    gpl_ctr = 0
+    playlistCtr = 0
     tif = open(plv.tag_indexfile, 'wb')
-
     if plv.invalidateAllTags:
         lenplkeys = len(plv.plkeys)
     else:
         lenplkeys = len(filter(lambda x: plv.playlists[x] != [] and x in plv.invalidateTheseTags, plv.plkeys))
-
     for v in plkeysSorted():
         if plv.playlists[v] == []:
             continue
-        tif.write((v+'\r\n').encode('utf-8'))
-        gpl_ctr += 1
+        playlistCtr += 1
+        curPlaylistName = '[%02d]'%playlistCtr + v + plv.plExt
+        #tif.write((v+'\r\n').encode('utf-8'))
+        tif.write((v+'\t'+curPlaylistName+'\r\n').encode('utf'))
         if not plv.invalidateAllTags and v not in plv.invalidateTheseTags:
             continue
-        pf = open(os.path.join(plv.ROOTDIR, '[%02d]'%gpl_ctr + v + plv.plExt), 'wb')
+        pf = open(opj(plv.ROOTDIR, curPlaylistName), 'wb')
         plv.playlists[v].sort(key=lambda x: plv.fileNames2sortKeys[x])
         ctr += 1
         print 'Writing: ('+str(ctr)+'/'+str(lenplkeys)+') '+v
         for k in plv.playlists[v]:
-            pf.write((k.replace(plv.ROOTDIR, '/').replace('\\','/')+'\r\n').encode('utf-8'))
+            pf.write((k.replace(plv.ROOTDIR, '/').replace('\\','/')+'\r\n').encode('utf'))
         pf.close()
     tif.close()
     #write rating data
@@ -535,13 +535,23 @@ def cmd_pp(buf):
     
 def cmd_p(buf):
     nosortFlag = (buf[0] == '--nosort')
+    bufSplit = buf[0].split(' ')
+    useLocals = False
+    if '--uselocals' in bufSplit:
+        useLocals = True
+        bufSplit.remove('--uselocals')
+        buf[0] = ' '.join(bufSplit)
     playAll = (len(buf[0]) == 0 or nosortFlag)
     try:
         if playAll:
             num = 0
         else:
-            if getAlias(buf[0]) in plv.playlists:
-                addMacro('/show '+buf[0]+';/p')
+            alias = getAlias(buf[0])
+            if alias in plv.playlists:
+                if useLocals:
+                    addMacro('/show '+buf[0]+';/p')
+                else:
+                    playPlaylist(opj(plv.ROOTDIR, plv.tagToPlaylist[alias]))
                 plv.continueFlag = True
                 return
             else:
@@ -746,7 +756,7 @@ def cmd_newhelper(buf):
     # exclude albums
     plv.rr = filter(lambda x: '\\+ Albums\\' not in x.data['fn'], plv.rr)
     print 'Non-album songs from less than '+str(n)+' days ago:'
-    newr = filter(lambda x: fileIsNewAndExists(x, n), plv.rr.data['fn'])
+    newr = filter(lambda x: fileIsNewAndExists(x.data['fn'], n), plv.rr)
     if newr != []:
         plv.orderASpecialSearch = True
         plv.rr = newr[:]

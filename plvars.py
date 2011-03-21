@@ -65,6 +65,7 @@ tagsByName = {}
 tag_aliases = {}
 fileNames2sortKeys = {}
 sortKeys2fileNames = {}
+tagToPlaylist = {}
 #keys are full file names
 #values are struct_time
 fileNames2Dates = {}

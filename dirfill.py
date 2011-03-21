@@ -15,6 +15,10 @@ def init():
     dirCtr = 0
 
 def recurlist(d, basicInfo=False):
+    print 'Browsing: '+d
+    recurlistHelper(d, basicInfo)
+
+def recurlistHelper(d, basicInfo):
     global ctr, files
     for f in sorted(listdir(d)): #azutils listdir function that works with unicode strings
         f = os.path.join(d, f)
@@ -34,7 +38,7 @@ def recurlist(d, basicInfo=False):
                     print ctr
         else:
             if f not in plv.excludedirs:
-                recurlist(f, basicInfo)
+                recurlistHelper(f, basicInfo)
 
 def findAllDirsIn(d):
     global dirs, dirCtr
@@ -49,7 +53,7 @@ def findAllDirsIn(d):
             
 def writeSongLines(path, type):
     global ctr, files
-    print '\n'+str(ctr)+' new entries found.\nSaving '+os.path.basename(path)+'...'
+    print str(ctr)+' new entries found.\nSaving '+os.path.basename(path)+'...\n'
     out = open(path, type)
     out.writelines(files)
     out.close()
@@ -58,20 +62,24 @@ def main():
     global ctr, files, filesAlreadyInList, dirs, dirCtr
     init()
     if '-a' in sys.argv:
-        findAllDirsIn(plv.ROOTDIR)
-        print '\n'+str(dirCtr)+' directories found.\nSaving albums.txt...'
+        d = plv.ROOTDIR
+        print 'Browsing: '+d
+        findAllDirsIn(d)
+        print str(dirCtr)+' directories found.\nSaving albums.txt...\n'
         fwrite(dirs, plv.albumfile)
     if '-n' in sys.argv:
-        l = dirFillToList()
+        l = readSongList(plv.DIRFILLPATH)
         filesAlreadyInList = list(map(lambda x: x[0], l))
         recurlist(plv.NEWESTPATH)
         writeSongLines(plv.DIRFILLPATH, 'ab')
+        l = readSongList(plv.localDirfillFile)
+        filesAlreadyInList = list(map(lambda x: x[0], l))
     else:
         recurlist(plv.ROOTDIR)
         writeSongLines(plv.DIRFILLPATH, 'wb')
         init()
-        recurlist(plv.LOCALSONGSPATH, basicInfo=True)
-        writeSongLines(plv.localDirfillFile, 'wb')
+    recurlist(plv.LOCALSONGSPATH, basicInfo=True)
+    writeSongLines(plv.localDirfillFile, 'wb')
     os.system('python2.7 redo_tags.py '+' '.join(sys.argv[1:]))
     waitAtEnd()
 

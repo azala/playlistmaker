@@ -89,6 +89,10 @@ def bracketNum(n):
 def fileIsNew(fn, n):
     return datetime.date.today() - datetime.date.fromtimestamp(os.stat(fn).st_mtime) < datetime.timedelta(days=n)
 
+def readSongList(fn):
+    dfl = map(lambda x: x.split('\t'), clean(fread(fn)))
+    return dfl
+
 def dirFillToList():
     infile = tryOpen(plv.DIRFILLPATH, 'rb')
     dfl = map(lambda x: x.decode('utf').strip().split('\t'), infile.readlines())
@@ -167,10 +171,14 @@ def needAutoBackup(bdir = mainBackupDir()):
     #print b-a, 'since last backup.' (I might want this later)
     return b - a >= datetime.timedelta(days=plv.AUTOBACKUP_INTERVAL)
     
+def playPlaylist(fn):
+    print 'Playing: '+fn
+    subprocess.Popen([plv.mediaplayer, fn])    
+    
 def playSongs(songs, sort = True):
     try:
         localCtr = writePls(plv.LASTPLSPATH, songs, sort, localFlag=True)
-        print str(localCtr)+' local files used.'
+        print str(localCtr)+' local files used. (%.0f%%)' % ((localCtr*100)/float(len(songs)))
         subprocess.Popen([plv.mediaplayer, plv.LASTPLSPATH])
         return True
     except:
