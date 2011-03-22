@@ -143,9 +143,9 @@ def moveFile(src, dst, banish = False):
             plv.taglists[dst] = plv.taglists[src][:]
         del plv.taglists[src]
     #all filenames database update
-    plv.lines.remove(src)
+    plv.lines.remove(plv.songDict['fn'][src])
     if not banish:
-        plv.lines.append(dst)
+        plv.lines.append(plv.songDict['fn'][dst])
     #update dirfill.txt
     if not banish:
         replacedDst = False
@@ -536,10 +536,10 @@ def cmd_pp(buf):
 def cmd_p(buf):
     nosortFlag = (buf[0] == '--nosort')
     bufSplit = buf[0].split(' ')
-    useLocals = False
-    if '--uselocals' in bufSplit:
-        useLocals = True
-        bufSplit.remove('--uselocals')
+    quickFlag = False
+    if '--quick' in bufSplit:
+        quickFlag = True
+        bufSplit.remove('--quick')
         buf[0] = ' '.join(bufSplit)
     playAll = (len(buf[0]) == 0 or nosortFlag)
     try:
@@ -548,7 +548,7 @@ def cmd_p(buf):
         else:
             alias = getAlias(buf[0])
             if alias in plv.playlists:
-                if useLocals:
+                if not quickFlag:
                     addMacro('/show '+buf[0]+';/p')
                 else:
                     playPlaylist(opj(plv.ROOTDIR, plv.tagToPlaylist[alias]))

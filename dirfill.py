@@ -63,7 +63,7 @@ def main():
     init()
     if '-a' in sys.argv:
         d = plv.ROOTDIR
-        print 'Browsing: '+d
+        print 'Browsing albums: '+d
         findAllDirsIn(d)
         print str(dirCtr)+' directories found.\nSaving albums.txt...\n'
         fwrite(dirs, plv.albumfile)
