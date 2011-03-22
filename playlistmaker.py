@@ -105,8 +105,10 @@ def readRatingData():
     print 'Loaded rating data.'
     
 #---FILE MOVE
-        
+# I hate this code. Come up with a better data model...
 def moveFile(src, dst, banish = False):
+    # src and dst are strings
+    # Check if our src/dst are valid.
     if src == dst:
         print 'Failed, both names are the same.'
         return
@@ -114,11 +116,19 @@ def moveFile(src, dst, banish = False):
         if e[2] == dst:
             print 'Failed, another file is going to move there.'
             return
+    # Try physically moving it.
     try:
         subprocess.check_call(['move', src, dst], shell=True)
     except (subprocess.CalledProcessError, WindowsError) as e:
         print 'Move failed: '+str(e)
         return
+    # So the move was successful if it got here...
+    song = plv.songDict['fn'][src]
+    song.data['fn'] = dst
+    song.data['sk'] = dstKey = pathToFileNameKey(dst)
+    plv.songDict['fn'][dst] = song
+    plv.songDict['sk'][dstKey] = song
+    
     #sort key update
     srcKey = plv.fileNames2sortKeys[src]
     del plv.sortKeys2fileNames[srcKey]
@@ -1096,8 +1106,6 @@ def main():
         print plv.ROOTDIR+' doesn\'t exist, aborting.'
         raw_input()
         return
-    plv.songDict = {'fn':{},
-                    'sk':{},}
     plv.dirFillLines = dirFillToList()
     timelist = [time.clock()]
     #plv.lines = map(lambda x: x[0], plv.dirFillLines)

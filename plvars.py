@@ -59,7 +59,8 @@ results = []
 cmdQueue = []
 ptag_index = []
 songs = []
-songDict = {}
+songDict = {'fn':{},
+            'sk':{},}
 tags = []
 tagsByName = {}
 tag_aliases = {}
