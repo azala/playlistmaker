@@ -6,6 +6,14 @@ import datetime, time, calendar, os, subprocess, shutil, sys
 import plvars as plv
 from azutils import *
 
+class ParseCmdResult:
+    def __init__(self):
+        self.careAboutNegs = False
+        self.terms = []
+        self.negTerms = []
+        #self.flags = []
+        self.params = {}
+
 class Tag(object):
     def __init__(self, name = '', songs = []):
         self.data = {'name' : name,
@@ -89,9 +97,9 @@ def bracketNum(n):
 def fileIsNew(fn, n):
     return datetime.date.today() - datetime.date.fromtimestamp(os.stat(fn).st_mtime) < datetime.timedelta(days=n)
 
-def readSongList(fn):
-    dfl = map(lambda x: x.split('\t'), clean(fread(fn)))
-    return dfl
+def readSplitList(fn):
+    ret = map(lambda x: x.split('\t'), clean(fread(fn)))
+    return ret
 
 def dirFillToList():
     infile = tryOpen(plv.DIRFILLPATH, 'rb')
@@ -208,13 +216,6 @@ def fileAge(key):
 
 def copy(src, dst):
     shutil.copy(src, dst)
-    
-def tagsAsString(fn):
-    if fn in plv.taglists:
-        tl = plv.taglists[fn]
-    else:
-        tl = []
-    return tagListToString(tl)
 
 def tagListToString(taglist):
     return ', '.join(taglist)

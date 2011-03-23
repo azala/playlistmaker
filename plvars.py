@@ -50,7 +50,7 @@ WAITATEND = False
 #variables
 orphans = []
 playlists = {} #values are full file names
-taglists = {} #keys are full file names
+#taglists = {} #keys are full file names
 plkeys = []
 quitlist = ['//', '/q', '/quit', '/exit', '/ns']
 helplist = ['?', '/h', '/help']

@@ -68,11 +68,11 @@ def main():
         print str(dirCtr)+' directories found.\nSaving albums.txt...\n'
         fwrite(dirs, plv.albumfile)
     if '-n' in sys.argv:
-        l = readSongList(plv.DIRFILLPATH)
+        l = readSplitList(plv.DIRFILLPATH)
         filesAlreadyInList = list(map(lambda x: x[0], l))
         recurlist(plv.NEWESTPATH)
         writeSongLines(plv.DIRFILLPATH, 'ab')
-        l = readSongList(plv.localDirfillFile)
+        l = readSplitList(plv.localDirfillFile)
         filesAlreadyInList = list(map(lambda x: x[0], l))
     else:
         recurlist(plv.ROOTDIR)
