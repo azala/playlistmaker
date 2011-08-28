@@ -1,8 +1,10 @@
+#!/usr/bin/env python
+
 # for functions used by other parts, like dirfill.py, in addition to playlistmaker.py
 # if used only in playlistmaker.py, put it there.
 # if it has even wider use, put it in azutils
 
-import datetime, time, calendar, os, subprocess, shutil, sys
+import datetime, time, calendar, os, subprocess, shutil, sys, unicodedata
 import plvars as plv
 from azutils import *
 
@@ -15,20 +17,48 @@ class ParseCmdResult:
         self.params = {}
 
 class Tag(object):
-    def __init__(self, name = '', songs = []):
+    tagsByAlias = {}
+    tagsByName = {}
+    def __init__(self, name = '', songs = None, aliases = None):
+        if songs == None:
+            songs = []
+        if aliases == None:
+            aliases = []
         self.data = {'name' : name,
-                     'songs' : songs}
+                     'songs' : songs,
+                     'aliases' : aliases}
+    def addAlias(self, s):
+        if s in Tag.tagsByAlias:
+            print 'Alias "'+s+'" already in use.'
+            return False
+        else:
+            Tag.tagsByAlias[s] = self
+            self.data['aliases'].append(s)
+            return True
+    def delAlias(self, s):
+        if Tag.tagsByAlias[s] != self:
+            print 'Alias "'+s+'" is not for this tag.'
+            return False
+        else:
+            del Tag.tagsByAlias[s]
+            self.data['aliases'].remove(s)
+            return True
         
 def getTag(name):
     return next((tag for tag in plv.tags if tag.data['name'] == name), None)
     #return filter(lambda x: x.data['name'] == name, plv.tags)[0]
+    
+def tagsToNames(l):
+    return map(lambda x: x.data['name'], l)
 
 class DirData(object):
     def __init__(self, fn):
         self.data = {'fn' : fn }
 
 class SongData(object):
-    def __init__(self, fn, sk = '', rating = 0, tags = [], mtime = plv.cZeroTime):
+    def __init__(self, fn, sk = '', rating = 0, tags = None, mtime = plv.cZeroTime):
+        if tags == None:
+            tags = []
         self.data = {'fn' : fn,
                      'sk' : sk,
                      'rating' : rating,
@@ -52,6 +82,11 @@ class SongData(object):
         self.updateNameOrKey(fn, 'fn')
     def updateKey(self, sk):
         self.updateNameOrKey(sk, 'sk')
+    def getArtistAndTitle(self):
+        if '-' in self.data['sk']:
+            artist,temp,title = self.data['sk'].partition('-')
+            return artist.strip(),title.strip()
+        return ('','')
             
 def getSongs(attrName, attrValue, songs):
     return filter(lambda x: x.data[attrName] == attrValue, songs)
@@ -84,7 +119,8 @@ def pathToFileNameKey(p):
 def shortNameToFullDict(l):
     ret = {}
     for fn in l:
-        k = os.path.basename(fn).lower()
+        #k = os.path.basename(fn).lower()
+        k = unorm(fn.rpartition(plv.cSep)[2].lower())
         if k in ret:
             ret[k].append(fn)
         else:
@@ -104,6 +140,9 @@ def readSplitList(fn):
 def dirFillToList():
     infile = tryOpen(plv.DIRFILLPATH, 'rb')
     dfl = map(lambda x: x.decode('utf').strip().split('\t'), infile.readlines())
+    for item in dfl:
+        item[0] = unorm(item[0])
+        item[1] = unorm(item[1])
     infile.close()
     return dfl
 
@@ -134,26 +173,6 @@ def writePls(fn, songlist, sort, localFlag=False):
     songNames = unclean(map(func, songlist))
     fwrite(songNames, fn)
     return localCtr[0]
-    
-def replaceDirFillEntry(mfqEntries):
-    if mfqEntries == []:
-        return
-    f = open(plv.DIRFILLPATH, 'rb')
-    dfLines = f.readlines()
-    f.close()
-    g = open(plv.DIRFILLPATH, 'wb')
-    for l in dfLines:
-        repStr = None
-        for e in mfqEntries:
-            if l.decode('utf-8').startswith(e[0]+'\t'):
-                repStr = e[2]+'\t'+e[3]+'\t'+dateTimeStr(plv.fileNames2Dates[e[2]])+'\r\n'
-                break
-        if repStr == None:
-            g.write(l)
-        else:
-            g.write(repStr.encode('utf'))
-    g.close()
-    print 'Applied moved files to dirfill.txt.'
 
 def tryPrint(s, prefix = ''):
     try:
@@ -187,7 +206,7 @@ def playSongs(songs, sort = True):
     try:
         localCtr = writePls(plv.LASTPLSPATH, songs, sort, localFlag=True)
         print str(localCtr)+' local files used. (%.0f%%)' % ((localCtr*100)/float(len(songs)))
-        subprocess.Popen([plv.mediaplayer, plv.LASTPLSPATH])
+        subprocess.Popen(plv.mediaplayer.split(' ')+[plv.LASTPLSPATH])
         return True
     except:
         return False
@@ -218,13 +237,49 @@ def copy(src, dst):
     shutil.copy(src, dst)
 
 def tagListToString(taglist):
-    return ', '.join(taglist)
+    return ', '.join(map(lambda x: x.data['name'], taglist))
 
 def ratingToString(r):
     if r == 0:
         return ''
     else:
         return str(r)
+    
+def callDirfill():
+    subprocess.Popen(['python2.7', 'dirfill.py'])
+    
+def doesGenreFolderExist(s):
+    p = opj(plv.GENRESPLITPATH, s)
+    return os.path.exists(p)
 
+#LOCKING MECHANISM
 
+def isLocked():
+    return os.path.exists(plv.lock_file)
+
+def lock():
+    #print 'Creating "'+plv.lock_file+'"'
+    #os.system('type nul > "'+plv.lock_file+'"')
+    os.system('touch "'+plv.lock_file+'"')
+    
+def unlock():
+    if isLocked():
+        os.system('rm '+plv.lock_file)
+    
+def checkLock():
+    if not isLocked():
+        lock()
+        return True
+    else:
+        s = raw_input('Lock file exists. Kill? (y/N) ')
+        if (s.lower() == 'y'):
+            print 'Unlocking.'
+            unlock()
+            return True 
+        else:
+            print 'Not unlocking. Bye!'
+            return False
+        
+def unorm(s):
+    return unicodedata.normalize(plv.cEncoding, s)
     

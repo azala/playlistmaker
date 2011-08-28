@@ -1,0 +1,6 @@
+.DS_Store
+*.txt
+*.ini
+*.bat
+*.pyc
+old/*

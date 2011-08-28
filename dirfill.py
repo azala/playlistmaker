@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys, os, os.path, subprocess
 import plvars as plv
 from plutil import *
@@ -15,6 +17,8 @@ def init():
     dirCtr = 0
 
 def recurlist(d, basicInfo=False):
+    global files
+    files = []
     print 'Browsing: '+d
     recurlistHelper(d, basicInfo)
 
@@ -25,17 +29,21 @@ def recurlistHelper(d, basicInfo):
         if not os.path.isdir(f):
             x = f.rpartition('.')[2].lower()
             if x in plv.extns and f not in filesAlreadyInList:
-                if basicInfo:
-                    datalist = [f]
+                #exclude mac's stupid ._ files
+                if f.rpartition('\\')[2].startswith('._'):
+                    print 'Found mac fake file: '+f
                 else:
-                    datalist = [f,
-                                pathToFileNameKey(f),
-                                dateTimeStr(time.gmtime(os.path.getctime(f))),
-                                ]
-                files.append(dataToDirFillLine(datalist))
-                ctr += 1
-                if ctr % 500 == 0:
-                    print ctr
+                    if basicInfo:
+                        datalist = [f]
+                    else:
+                        datalist = [f,
+                                    pathToFileNameKey(f),
+                                    dateTimeStr(time.gmtime(os.path.getctime(f))),
+                                    ]
+                    files.append(dataToDirFillLine(datalist))
+                    ctr += 1
+                    if ctr % 500 == 0:
+                        print ctr
         else:
             if f not in plv.excludedirs:
                 recurlistHelper(f, basicInfo)
@@ -71,15 +79,17 @@ def main():
         l = readSplitList(plv.DIRFILLPATH)
         filesAlreadyInList = list(map(lambda x: x[0], l))
         recurlist(plv.NEWESTPATH)
-        writeSongLines(plv.DIRFILLPATH, 'ab')
+        mode = 'ab'
+        writeSongLines(plv.DIRFILLPATH, mode)
         l = readSplitList(plv.localDirfillFile)
         filesAlreadyInList = list(map(lambda x: x[0], l))
     else:
         recurlist(plv.ROOTDIR)
-        writeSongLines(plv.DIRFILLPATH, 'wb')
+        mode = 'wb'
+        writeSongLines(plv.DIRFILLPATH, mode)
         init()
     recurlist(plv.LOCALSONGSPATH, basicInfo=True)
-    writeSongLines(plv.localDirfillFile, 'wb')
+    writeSongLines(plv.localDirfillFile, mode)
     os.system('python2.7 redo_tags.py '+' '.join(sys.argv[1:]))
     waitAtEnd()
 

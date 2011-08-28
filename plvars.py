@@ -1,21 +1,32 @@
+#!/usr/bin/env python
+
+import os
 from azutils import *
 
 #constants
 plExt = '.m3u8'
+cSep = '/'
+cEncoding = 'NFC'
 
-CDATAPATH = 'C:\\playlistmaker_data'
-ROOTDIR = 'E:\\'
+PLMAKERDIR = os.path.expanduser('~/pystuff/PlaylistMaker_2.7')
+CDATAPATH = os.path.expanduser('~/pystuff/PlaylistMaker_2.7/playlistmaker_data')
+ROOTDIR = '/Volumes/IPOD'
 
 GENRESPLITPATH = opj(ROOTDIR, '+ Genre Split')
 NEWESTPATH = opj(GENRESPLITPATH, '+ NEWEST')
+REALLYNEWESTPATH = opj(GENRESPLITPATH, '+ REALLY NEWEST')
 ALBUMPATH = opj(GENRESPLITPATH, '+ Albums')
 DONTWANTPATH = opj(GENRESPLITPATH, 'z(don\'t want, duplicates or crap)')
 LASTPLSPATH = opj(CDATAPATH, 'last')+plExt
 BACKUPDIRS = [CDATAPATH, opj(ROOTDIR, 'backups')]
 SAVEDPLAYLISTPATH = opj(ROOTDIR, 'saved playlists')
 SETPATH = opj(GENRESPLITPATH, '+ sets')
-LOCALSONGSPATH = r'C:\Documents and Settings\Michel DSa\Desktop\+ ALREADY ON IPOD'
+#LOCALSONGSPATH = r'C:\Documents and Settings\Michel DSa\Desktop\+ ALREADY ON IPOD'
+LOCALSONGSPATH = os.path.expanduser('~/Desktop/+ MUSIC')
+MOVEDPATH = opj(ROOTDIR, 'moved')
+DESKTOP = os.path.expanduser('~/Desktop')
 
+lock_file = opj(CDATAPATH, 'lock')
 preprocess_file = opj(CDATAPATH, 'preprocess.txt')
 tagfile = opj(CDATAPATH, 'tags.txt')
 DIRFILLPATH = opj(CDATAPATH, 'dirfill.txt')
@@ -28,8 +39,11 @@ cmdListFile = opj(CDATAPATH, 'commandlist.txt')
 ratingFile = opj(CDATAPATH, 'ratings.txt')
 localDirfillFile = opj(CDATAPATH, 'local-dirfill.txt')
 
-mediaplayer = 'winamp'
-notepad = 'notepad++'
+#mediaplayer = 'winamp'
+#mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC '
+mediaplayer = 'open -a vlc.app'
+#notepad = 'notepad++'
+notepad = 'open -e'
 extns = ['mp3','wav','aac','ogg','flac','wma','m4a']
 excludedirs = [DONTWANTPATH,
                opj(GENRESPLITPATH, 'other'),
@@ -46,12 +60,13 @@ cZeroTime = time.gmtime(0)
 
 #settings
 WAITATEND = False
+NOIPODMODE = False
 
 #variables
-orphans = []
-playlists = {} #values are full file names
-taglists = {} #keys are full file names
-plkeys = []
+#orphans = []
+#playlists = {} #values are full file names
+#taglists = {} #keys are full file names
+#plkeys = []
 quitlist = ['//', '/q', '/quit', '/exit', '/ns']
 helplist = ['?', '/h', '/help']
 lastTag = None
@@ -63,15 +78,15 @@ songDict = {'fn':{},
             'sk':{},}
 tags = []
 tagsByName = {}
-tag_aliases = {}
+#tag_aliases = {}
 fileNames2sortKeys = {}
 sortKeys2fileNames = {}
-tagToPlaylist = {}
+tagToPlaylist = {} #tag name -> its associated playlist name
 #keys are full file names
 #values are struct_time
 fileNames2Dates = {}
 saveAtEnd = True
-move_file_queue = []
+#move_file_queue = []
 dirFillLines = []
 needRewriteDirfill = False
 invalidateTheseTags = []
@@ -99,5 +114,8 @@ allowRefine = False
 #nosort = False
 lenrr = 0
 orderASpecialSearch = False
+needToCallDirfill = False
+aliasesChanged = False
 
 INITIALIZED = True
+MENU_AVAILABLE = False

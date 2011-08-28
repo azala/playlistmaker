@@ -1,12 +1,13 @@
-import os
-import sys
-import re
+#!/usr/bin/env python
+
+import os, sys, re, azutils
 
 RENAME = False
 RECURSIVE = False
 LISTALL = False
 LIMIT_MATCHES = False
 CHAR_REPLACE_DIR = { '\uff5e' : '~' }
+ANNIHILATE_THRESHOLD = 1000000 #1 megabyte
 
 def altRename(old, new):
     global RENAME
@@ -14,11 +15,35 @@ def altRename(old, new):
         try:
             os.rename(old, new)
             print new
-        except WindowsError:
+        except:
             print 'Failed rename: '+new
+        
+def standard_rename_op(s):
+    global CHAR_REPLACE_DIR
+    split = os.path.split(s)
+    fn = split[1]
+    for c in CHAR_REPLACE_DIR:
+        fn = fn.replace(c, CHAR_REPLACE_DIR[c])
+    fn = fn.replace("www.mrtzcmp3.net","")
+    fn = fn.replace("_"," ")
+    fn = fn.replace("amp;","&")
+    fn = re.sub(r"\ {2,}"," ",fn)
+    fn = re.sub("(\([0-9]*\))?.mp3",".mp3",fn)
+    fn = re.sub(" ?-.mp3",".mp3",fn)
+    if "-" in fn:
+        l = list(fn.partition("-"))
+        if len(l[0]) < 2 and "-" in l[2]:
+            ll = l[2].partition("-")
+            l[0] += "-"+ll[0]
+            l[2] = ll[2]
+        fn = l[0].strip()+" - "+l[2][:-4].strip()+".mp3"
+    ret = os.path.join(split[0], fn)
+    return ret
         
 def convert(s):
     if not s.endswith(".mp3"):
+        return False
+    if annihilateDotUnderscore(s):
         return False
     split = os.path.split(s)
     fn = split[1]
@@ -66,7 +91,8 @@ def renameFiles(d, maxmatches, ctr):
                     subdirlist.append(fullitem)
             if LISTALL:
                 try:
-                    print item
+                    pass
+                    #print item
                 except:
                     pass
         except UnicodeEncodeError as e:
@@ -75,6 +101,15 @@ def renameFiles(d, maxmatches, ctr):
     for subdir in subdirlist:
         ctr = renameFiles(subdir, maxmatches, ctr)
     return ctr
+
+def annihilateDotUnderscore(s):
+    global ANNIHILATE_THRESHOLD
+    t = s.rpartition(azutils.cSep)[2]
+    if (len(t) >= 2 and t[0] == '.' and os.path.exists(s) and os.stat(s).st_size < ANNIHILATE_THRESHOLD):
+        os.system('rm "'+s+'"')
+        print 'Dot-trashed "'+s+'".'
+        return True
+    return False
 
 def main():
     global RENAME, RECURSIVE, LISTALL, LIMIT_MATCHES

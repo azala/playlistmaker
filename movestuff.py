@@ -1,13 +1,18 @@
-import os
+#!/usr/bin/env python
 
-DESKTOP = 'C:\\Documents and Settings\\Michel DSa\\Desktop\\'
-EMUSIC = 'E:\\+ Genre Split\\+ NEWEST\\'
-ALREADYONIPOD = 'C:\\Documents and Settings\\Michel DSa\\Desktop\\+ ALREADY ON IPOD\\'
+import os
+import plvars as plv
+
 #l = list(filter(lambda x: x.endswith('.mp3'), os.listdir(DESKTOP)))
 #for fn in l:
-if os.path.exists(EMUSIC):
-    os.system('copy "'+DESKTOP+'*.mp3" "'+EMUSIC+'" /y')
-    os.system('move "'+DESKTOP+'*.mp3" "'+ALREADYONIPOD+'"')
-else:
-    print 'Not found: '+EMUSIC
-#print('Finished: '+fn)
+go = True
+for p in [plv.NEWESTPATH, plv.REALLYNEWESTPATH, plv.DESKTOP]:
+    if not os.path.exists(p):
+        print 'Not found: '+p
+        go = False
+if go:
+    os.system('cp "'+plv.DESKTOP+'*.mp3" "'+plv.NEWESTPATH+'"')
+    os.system('mv "'+plv.DESKTOP+'*.mp3" "'+plv.LOCALSONGPATH+'"')
+    #reallynewest
+    os.system('copy "'+plv.REALLYNEWESTPATH+'*.mp3" "'+plv.LOCALSONGPATH+'" /y')
+    os.system('move "'+plv.REALLYNEWESTPATH+'*.mp3" "'+plv.NEWESTPATH+'"')

@@ -1,5 +1,8 @@
+#!/usr/bin/env python
+
 import os, shutil, sys
 import plvars as plv
+import rename
 from plutil import *
 
 def decoded(lines):
@@ -8,23 +11,24 @@ def decoded(lines):
     for ls in lines:
         #ls = l.decode('utf').split('\t')
         fn = ls[0]
-        k = fn.rpartition('\\')[2].lower()
+        k = fn.rpartition(plv.cSep)[2].lower()
         if k in ret and boo:
             print str(k)
             print '  '+ret[k]
             print '  '+fn
             i = raw_input('Move which one?\n>> ')
             if i == '1':
-                shutil.move(ret[k], 'E:\\moved')
+                shutil.move(ret[k], plv.MOVEDPATH)
                 print 'Moved 1.'
             elif i == '2':
-                shutil.move(fn, 'E:\\moved')
+                shutil.move(fn, plv.MOVEDPATH)
                 print 'Moved 2.'
         ret[k] = fn
     return ret
 
 f = open(plv.DIRFILLPATH, 'rb')
-l = list(map(lambda x: x.decode('utf').split('\t'), f.readlines()))
+#l = list(map(lambda x: x.decode('utf').split('\t'), f.readlines()))
+l = list(map(lambda x: x.split('\t'), clean(fread(plv.DIRFILLPATH))))
 kmdict = shortNameToFullDict(list(map(lambda x: x[0], l)))
 fdict = decoded(l)
 f.close()
@@ -35,7 +39,8 @@ g.close()
 
 ret = []
 for gl in glist:
-    glShort = gl[0].rpartition('\\')[2].lower()
+    gl[0] = gl[0].replace('\\',plv.cSep)
+    glShort = unorm(gl[0].rpartition(plv.cSep)[2].lower())
     if glShort in kmdict and gl[0] not in kmdict[glShort]:
         try:
             print 'Detected move: '+glShort
@@ -51,9 +56,23 @@ g.close()
 print 'Writing ratings...'
 h = clean(fread(plv.ratingFile))
 dst = []
+#backslash check
+try:
+    backslashes = ('\\' in h[0])
+except:
+    backslashes = False
+#
 for ratingLine in h:
+    if backslashes:
+        ratingLine = ratingLine.replace('\\',plv.cSep)
     pt = ratingLine.partition('\t')
-    short = pt[0].rpartition('\\')[2].lower()
+    short = unorm(pt[0].rpartition(plv.cSep)[2].lower())
+    if short not in kmdict:
+        print short
+        for k in kmdict:
+            if '16 slasher' in k:
+                print k
     dst.append(kmdict[short][0]+'\t'+pt[2])
+dst = map(unorm, dst)
 fwrite(unclean(dst), plv.ratingFile)
 print 'Done!\n'

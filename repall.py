@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 f = open('plvars.py', 'rb')
 varlist = []
 for l in f.readlines():

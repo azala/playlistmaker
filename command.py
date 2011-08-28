@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from azutils import *
 import plvars as plv
 
@@ -24,4 +26,3 @@ def findCmd(name):
 
 cl = clean(fread(plv.cmdListFile))
 plv.commandlist = map(makeCmd, cl)
-print('')
