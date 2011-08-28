@@ -3,4 +3,5 @@
 *.ini
 *.bat
 *.pyc
+*.m3u8
 old/*
