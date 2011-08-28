@@ -8,8 +8,8 @@ plExt = '.m3u8'
 cSep = '/'
 cEncoding = 'NFC'
 
-PLMAKERDIR = os.path.expanduser('~/pystuff/PlaylistMaker_2.7')
-CDATAPATH = os.path.expanduser('~/pystuff/PlaylistMaker_2.7/playlistmaker_data')
+PLMAKERDIR = os.path.expanduser('~/pystuff/playlistmaker')
+CDATAPATH = opj(PLMAKERDIR,'playlistmaker_data')
 ROOTDIR = '/Volumes/IPOD'
 
 GENRESPLITPATH = opj(ROOTDIR, '+ Genre Split')
