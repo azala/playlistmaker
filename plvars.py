@@ -18,13 +18,14 @@ REALLYNEWESTPATH = opj(GENRESPLITPATH, '+ REALLY NEWEST')
 ALBUMPATH = opj(GENRESPLITPATH, '+ Albums')
 DONTWANTPATH = opj(GENRESPLITPATH, 'z(don\'t want, duplicates or crap)')
 LASTPLSPATH = opj(CDATAPATH, 'last')+plExt
-BACKUPDIRS = [CDATAPATH, opj(ROOTDIR, 'backups')]
+IPODBACKUPDIR = opj(ROOTDIR, 'backups')
+EXPORTDIR = opj(IPODBACKUPDIR, 'export')
+BACKUPDIRS = [CDATAPATH, IPODBACKUPDIR]
 SAVEDPLAYLISTPATH = opj(ROOTDIR, 'saved playlists')
 SETPATH = opj(GENRESPLITPATH, '+ sets')
-#LOCALSONGSPATH = r'C:\Documents and Settings\Michel DSa\Desktop\+ ALREADY ON IPOD'
-LOCALSONGSPATH = os.path.expanduser('~/Desktop/+ MUSIC')
 MOVEDPATH = opj(ROOTDIR, 'moved')
 DESKTOP = os.path.expanduser('~/Desktop')
+LOCALSONGSPATH = opj(DESKTOP,'+ MUSIC')
 
 lock_file = opj(CDATAPATH, 'lock')
 preprocess_file = opj(CDATAPATH, 'preprocess.txt')
@@ -48,8 +49,8 @@ extns = ['mp3','wav','aac','ogg','flac','wma','m4a']
 excludedirs = [DONTWANTPATH,
                opj(GENRESPLITPATH, 'other'),
                opj(ROOTDIR, '.rockbox'),
-               opj(ROOTDIR, 'moved'),
-               opj(ROOTDIR, 'backups')]
+               MOVEDPATH,
+               IPODBACKUPDIR]
 
 FUNC_PREFIX = 'cmd_'
 AUTOBACKUP_INTERVAL = 3 #days after last backup before automatically making another

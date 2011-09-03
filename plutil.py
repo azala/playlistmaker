@@ -206,6 +206,7 @@ def playSongs(songs, sort = True):
     try:
         localCtr = writePls(plv.LASTPLSPATH, songs, sort, localFlag=True)
         print str(localCtr)+' local files used. (%.0f%%)' % ((localCtr*100)/float(len(songs)))
+        killVLC()
         subprocess.Popen(plv.mediaplayer.split(' ')+[plv.LASTPLSPATH])
         return True
     except:
@@ -282,4 +283,7 @@ def checkLock():
         
 def unorm(s):
     return unicodedata.normalize(plv.cEncoding, s)
+    
+def killVLC():
+    os.system("kill `ps aux | grep /Applications/VLC.app/Contents/MacOS/VLC | awk '{print $2}'` 2> /dev/null")
     

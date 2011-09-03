@@ -5,3 +5,5 @@
 *.pyc
 *.m3u8
 old/*
+!*/commandlist.txt
+*/lock

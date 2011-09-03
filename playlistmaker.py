@@ -877,8 +877,44 @@ def cmd_guess(buf):
         else:
             print 'Guessed tags: '+', '.join(map(operator.itemgetter(0), l))
             print ''
+
+'''
+
+def inexHelper(buf):
+    parsed = parseCmd(buf[0])
+    lp = len(parsed)
+    if lp == 0:
+        print 'Using export dir "default".'
+        return 'default'
+    elif lp != 1:
+        print 'Usage: /export <name>', 'which is the folder you want to export to.'
+        return ''
+    return parsed[0]
     
+these should not exist, because they should be executed outside the scope of the program.
+
+def cmd_export(buf):
+    parsed = [inexHelper(buf)]
+    if parsed[0] == '':
+        return;
+    dir = opj(plv.EXPORTDIR,parsed[0])
+    for s in ['mkdir -p "'+dir+'"',
+              'cp '+opj('"'+plv.CDATAPATH+'"','*.txt')+' "'+dir+'"'
+              ]:
+        print s
+        os.system(s)
+        
+def cmd_import(buf):
+    parsed = [inexHelper(buf)]
+    if parsed[0] == '':
+        return;
+    dir = opj(plv.EXPORTDIR,parsed[0])
+    for s in ['cp '+opj('"'+dir+'"','*.txt')+' "'+plv.CDATAPATH+'"']:
+        print s
+        os.system(s)
+'''
 #----
+
 def boolstr(b):
     if b:
         return 'YES'
@@ -913,7 +949,7 @@ def parseCmdHelper(s, *flags):
         if slashed:
             term += c
             slashed = False
-        elif c == '\\': #this is to backslash characters for command parsing. don't normalize this.
+        elif c == '\\': #this is to backslash characters for command parsing. not part of windows filenames!
             slashed = True
         elif c == '"':
             inQuote = not inQuote
@@ -941,6 +977,8 @@ def parseCmdHelper(s, *flags):
             inAssignment = True
         else:
             term += c
+    if inQuote:
+        print 'You missed an endquote, so I put it in. :('
     if term != '':
         if inAssignment:
             pcr.params[curAssignment] = term

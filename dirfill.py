@@ -90,7 +90,7 @@ def main():
         init()
     recurlist(plv.LOCALSONGSPATH, basicInfo=True)
     writeSongLines(plv.localDirfillFile, mode)
-    os.system('python2.7 redo_tags.py '+' '.join(sys.argv[1:]))
+    os.system('python '+plv.PLMAKERDIR+'/redo_tags.py '+' '.join(sys.argv[1:]))
     waitAtEnd()
 
 if __name__ == '__main__':

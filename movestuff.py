@@ -11,8 +11,8 @@ for p in [plv.NEWESTPATH, plv.REALLYNEWESTPATH, plv.DESKTOP]:
         print 'Not found: '+p
         go = False
 if go:
-    os.system('cp "'+plv.DESKTOP+'*.mp3" "'+plv.NEWESTPATH+'"')
-    os.system('mv "'+plv.DESKTOP+'*.mp3" "'+plv.LOCALSONGPATH+'"')
+    os.system('cp "'+plv.DESKTOP+'/"*.mp3 "'+plv.NEWESTPATH+'"')
+    os.system('mv "'+plv.DESKTOP+'/"*.mp3 "'+plv.LOCALSONGSPATH+'"')
     #reallynewest
-    os.system('copy "'+plv.REALLYNEWESTPATH+'*.mp3" "'+plv.LOCALSONGPATH+'" /y')
-    os.system('move "'+plv.REALLYNEWESTPATH+'*.mp3" "'+plv.NEWESTPATH+'"')
+    os.system('cp "'+plv.REALLYNEWESTPATH+'/"*.mp3 "'+plv.LOCALSONGSPATH+'"')
+    os.system('mv "'+plv.REALLYNEWESTPATH+'/"*.mp3 "'+plv.NEWESTPATH+'"')
