@@ -42,7 +42,10 @@ localDirfillFile = opj(CDATAPATH, 'local-dirfill.txt')
 
 #mediaplayer = 'winamp'
 #mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC '
+
 mediaplayer = 'open -a vlc.app'
+second_mediaplayer = 'open -a itunes.app'
+
 #notepad = 'notepad++'
 notepad = 'open -e'
 extns = ['mp3','wav','aac','ogg','flac','wma','m4a']

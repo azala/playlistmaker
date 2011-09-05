@@ -364,6 +364,37 @@ def cmd_automp(buf):
 def cmd_this(lbuf):
     addMacro('/back 0')
 
+def cmd_cache(buf):
+    pcr = parseCmdHelper(buf[0])
+    l = len(pcr.terms)
+    if l != 1:
+        fail = True
+    else:
+        try:
+            if pcr.terms[0] == 'all':
+                rrhelper = plv.rr
+                fail = (len(plv.rr) == 0)
+            else:
+                n = int(pcr.terms[0])
+                rrhelper = [plv.rr[n-1]]
+                fail = False
+        except:
+            fail = True
+    if fail:
+        print 'Usage: cache <n> stores a local copy of nth result'
+        return
+    os.system('mkdir -p "'+plv.LOCALSONGSPATH+'/cache"')
+    for song in rrhelper:
+        if os.path.exists(os.path.join(plv.LOCALSONGSPATH, 'cache', os.path.split(song.data['fn'])[1]))\
+        or os.path.exists(os.path.join(plv.LOCALSONGSPATH, os.path.split(song.data['fn'])[1])):
+            print 'File already in local songs.'
+        else:
+            s = 'cp "'+song.data['fn']+'" "'+plv.LOCALSONGSPATH+'/cache"'
+            print s
+            os.system(s)
+    print 'Done.'
+    
+
 def cmd_tag(buf):
     plv.lastCmdWasSearch = False
     pcr = parseCmdHelper(buf[0])
@@ -453,6 +484,11 @@ def cmd_p(buf):
         quickFlag = True
         bufSplit.remove('--quick')
         buf[0] = ' '.join(bufSplit)
+    itunesFlag = False
+    if '-i' in bufSplit:
+        itunesFlag = True
+        bufSplit.remove('-i')
+        buf[0] = ' '.join(bufSplit)
     playAll = (len(buf[0]) == 0 or nosortFlag)
     try:
         if playAll:
@@ -467,7 +503,7 @@ def cmd_p(buf):
                 if not quickFlag:
                     addMacro('/show '+buf[0]+';/p')
                 else:
-                    playPlaylist(opj(plv.ROOTDIR, plv.tagToPlaylist[tname]))
+                    playPlaylist(opj(plv.ROOTDIR, plv.tagToPlaylist[tname]), itunesFlag)
                 plv.continueFlag = True
                 return
             else:
@@ -477,7 +513,7 @@ def cmd_p(buf):
         plv.continueFlag = True
         return
     if playAll and plv.lenrr > 0 and not plv.directorySearch:
-        if playSongs(plv.rr, not nosortFlag):
+        if playSongs(plv.rr, not nosortFlag, itunesFlag):
             print 'Playing files.'
         else:
             print 'Could not play files.'
@@ -486,7 +522,7 @@ def cmd_p(buf):
             addMacro('/ds;/cfds on;"'+plv.rr[num].data['fn']+'";/cfds off;/p --nosort')
             plv.continueFlag = True
             return
-        if playSong(plv.rr[num], not nosortFlag):
+        if playSong(plv.rr[num], not nosortFlag, itunesFlag):
             print 'Playing file '+plv.rr[num].data['fn']
         else:
             print 'Could not play file.'

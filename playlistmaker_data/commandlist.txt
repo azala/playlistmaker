@@ -3,6 +3,7 @@ automp: sets mp = /over 5 and np = /over 1
 back: <n> go back n searches
 backup: make backups of important files
 banish
+cache
 check: show files in dirfill that don't exist
 cfds
 dates: show file creation dates

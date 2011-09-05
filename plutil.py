@@ -198,22 +198,30 @@ def needAutoBackup(bdir = mainBackupDir()):
     #print b-a, 'since last backup.' (I might want this later)
     return b - a >= datetime.timedelta(days=plv.AUTOBACKUP_INTERVAL)
     
-def playPlaylist(fn):
+def playPlaylist(fn, itunesFlag):
     print 'Playing: '+fn
-    subprocess.Popen([plv.mediaplayer, fn])    
+    if itunesFlag:
+        mp = plv.second_mediaplayer
+    else:
+        mp = plv.mediaplayer
+    subprocess.Popen(mp.split(' ')+[fn])    
     
-def playSongs(songs, sort = True):
+def playSongs(songs, sort, itunesFlag):
     try:
         localCtr = writePls(plv.LASTPLSPATH, songs, sort, localFlag=True)
         print str(localCtr)+' local files used. (%.0f%%)' % ((localCtr*100)/float(len(songs)))
         killVLC()
-        subprocess.Popen(plv.mediaplayer.split(' ')+[plv.LASTPLSPATH])
+        if itunesFlag:
+            mp = plv.second_mediaplayer
+        else:
+            mp = plv.mediaplayer
+        subprocess.Popen(mp.split(' ')+[plv.LASTPLSPATH])
         return True
     except:
         return False
 
-def playSong(fn, sort = True):
-    return playSongs([fn], sort)
+def playSong(fn, sort, itunesFlag):
+    return playSongs([fn], sort, itunesFlag)
 
 def addMacro(s):
     plv.cmdQueue = doubleSlash(s).split(';') + plv.cmdQueue
@@ -247,7 +255,7 @@ def ratingToString(r):
         return str(r)
     
 def callDirfill():
-    subprocess.Popen(['python2.7', 'dirfill.py'])
+    subprocess.Popen(['python', 'dirfill.py'])
     
 def doesGenreFolderExist(s):
     p = opj(plv.GENRESPLITPATH, s)
