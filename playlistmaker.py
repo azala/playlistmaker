@@ -556,10 +556,10 @@ def cmd_dir(buf):
         print 'Bad index: '+buf[0]+'\r\nDefaulting to first element.'
         n = 0
     if plv.directorySearch:
-        os.system('explorer "'+plv.rr[n].data['fn']+'"')
+        os.system('open "'+os.path.dirname(plv.rr[n].data['fn'])+'"')
         print 'Showing directory.'
     else:
-        os.system('explorer "'+os.path.dirname(plv.rr[n].data['fn'])+'"')
+        os.system('open "'+os.path.dirname(plv.rr[n].data['fn'])+'"')
         print 'Showing parent directory.'
 
 def cmd_rn(buf):
