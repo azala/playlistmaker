@@ -3,6 +3,10 @@
 import plvars as plv, sys, os, subprocess
 from azutils import *
 
+if not os.path.exists(plv.ROOTDIR):
+    print 'IPOD doesn\'t exist.'
+    sys.exit(0)
+
 if sys.argv[1] == '-in':
     cmdname = 'import'
 else:

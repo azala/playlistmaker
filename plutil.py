@@ -59,6 +59,8 @@ class Tag(object):
         if type(other) == Tag:
             return cmp(self, other) == 0
         return False
+    def __ne__(self, other):
+        return not (self == other)
         
 def getTag(name):
     return next((tag for tag in plv.tags if tag.data['name'] == name), None)

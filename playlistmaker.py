@@ -146,9 +146,6 @@ def getPriorityTagNames():
         del plv.tagToPlaylist['']
     tags = filter(lambda x: x != '' and x not in ptags, plv.tagToPlaylist.keys())
     tags.sort()
-    print ptags
-    print tags
-    raw_input()
     return ptags, tags
 
 def sortedTags():
@@ -440,8 +437,9 @@ def cmd_tag(buf):
                     invalidate(t)
                     invalidatedAlready = True
         else:
-            print 'Re-invalidating new tag??'
-            raise Exception()
+            #this can be legitimately hit if you kill a tag, then make it again in the same session
+            #print 'Re-invalidating new tag??'
+            #raise Exception()
             invalidate()
             t.data['songs'].append(song)
             song.data['tags'].append(t)
@@ -467,6 +465,8 @@ def cmd_kill(buf):
     if tag != None:
         noInvalidate = len(args) == 2 and args[1] == '-i'
         killTag(tag, not noInvalidate)
+    else:
+        print 'Tag doesn\'t exist.'
 
 def cmd_ds(buf):
     if buf[0] != '':
