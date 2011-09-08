@@ -30,6 +30,7 @@ rn: <a> <b> rename tag a to b
 same: apply last tag
 save: <name> saves last-played results to a file
 show
+s
 sl
 tag: <name> apply tag to results
 tags: show each result's tags

@@ -146,6 +146,9 @@ def getPriorityTagNames():
         del plv.tagToPlaylist['']
     tags = filter(lambda x: x != '' and x not in ptags, plv.tagToPlaylist.keys())
     tags.sort()
+    print ptags
+    print tags
+    raw_input()
     return ptags, tags
 
 def sortedTags():
@@ -203,12 +206,15 @@ def readtags():
         tfLines.append(l)
         knownFileNames.append(l[0])
     print 'Imported '+str(ctr)+' tagged files.'
+    
+    #p-tag code
     plv.ptag_index, tag_index = getPriorityTagNames()
     plv.ptag_index = map(Tag, plv.ptag_index)
     tag_index = map(Tag, tag_index)
     for t in plv.ptag_index + tag_index:
         plv.tags.append(t)
         Tag.tagsByName[t.data['name']] = t
+        
     #plv.plkeys = plv.ptag_index + tag_index
     if plv.tags == []:
         print 'Blank tag index file.'
@@ -247,7 +253,7 @@ def readtags():
             else:
                 curSong.data['tags'].append(t)
             if curSong in t.data['songs']:
-                print '  Duplicate tag: '+t.data['name']
+                print '  Duplicate song: '+song.data['name']
                 invalidate()
             else:
                 t.data['songs'].append(curSong)
@@ -418,6 +424,7 @@ def cmd_tag(buf):
         t = Tag(tname)
         plv.tags.append(t)
         Tag.tagsByName[tname] = t
+        invalidate()
     plv.lastTag = t
     print 'Applying tag: '+tname
     invalidatedAlready = False
@@ -433,6 +440,8 @@ def cmd_tag(buf):
                     invalidate(t)
                     invalidatedAlready = True
         else:
+            print 'Re-invalidating new tag??'
+            raise Exception()
             invalidate()
             t.data['songs'].append(song)
             song.data['tags'].append(t)
@@ -646,6 +655,9 @@ def cmd_show(buf):
     else:
         plv.orderASpecialSearch = True
         plv.rr = Tag.tagsByName[tagName].data['songs']
+
+def cmd_s(buf):
+    cmd_show(buf)
 
 def cmd_fwd(buf):
     traverseCmd(buf[0], 1)

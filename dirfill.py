@@ -30,8 +30,10 @@ def recurlistHelper(d, basicInfo):
             x = f.rpartition('.')[2].lower()
             if x in plv.extns and f not in filesAlreadyInList:
                 #exclude mac's stupid ._ files
-                if f.rpartition('\\')[2].startswith('._'):
-                    print 'Found mac fake file: '+f
+                if os.path.basename(f).startswith('._'):
+                    print 'Found/removing mac fake file: '+f
+                    s = 'rm "'+f+'"'
+                    os.system(s)
                 else:
                     if basicInfo:
                         datalist = [f]

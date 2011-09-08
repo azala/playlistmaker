@@ -27,6 +27,8 @@ class Tag(object):
         self.data = {'name' : name,
                      'songs' : songs,
                      'aliases' : aliases}
+        self.hasPriority = False
+        self.priority = 0
     def addAlias(self, s):
         if s in Tag.tagsByAlias:
             print 'Alias "'+s+'" already in use.'
@@ -43,6 +45,20 @@ class Tag(object):
             del Tag.tagsByAlias[s]
             self.data['aliases'].remove(s)
             return True
+    def __cmp__(self, other):
+        if not (self.hasPriority == other.hasPriority):
+            if (self.hasPriority):
+                return -1
+            else:
+                return 1
+        elif (self.priority != other.priority):
+            return self.priority - other.priority
+        else:
+            return cmp(self.data['name'], other.data['name'])
+    def __eq__(self, other):
+        if type(other) == Tag:
+            return cmp(self, other) == 0
+        return False
         
 def getTag(name):
     return next((tag for tag in plv.tags if tag.data['name'] == name), None)
