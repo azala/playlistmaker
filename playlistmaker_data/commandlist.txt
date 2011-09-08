@@ -12,6 +12,7 @@ ds: toggle directory search flag or <name> do a directory search
 fmove
 fwd: <n> go forward n searches
 guess
+i: toggles itunes as media player
 info
 kill: <name> remove tag from all files
 list: show all tags

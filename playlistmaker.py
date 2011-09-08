@@ -484,11 +484,11 @@ def cmd_p(buf):
         quickFlag = True
         bufSplit.remove('--quick')
         buf[0] = ' '.join(bufSplit)
-    itunesFlag = False
-    if '-i' in bufSplit:
-        itunesFlag = True
-        bufSplit.remove('-i')
-        buf[0] = ' '.join(bufSplit)
+#    itunesFlag = False
+#    if '-i' in bufSplit:
+#        itunesFlag = True
+#        bufSplit.remove('-i')
+#        buf[0] = ' '.join(bufSplit)
     playAll = (len(buf[0]) == 0 or nosortFlag)
     try:
         if playAll:
@@ -503,7 +503,7 @@ def cmd_p(buf):
                 if not quickFlag:
                     addMacro('/show '+buf[0]+';/p')
                 else:
-                    playPlaylist(opj(plv.ROOTDIR, plv.tagToPlaylist[tname]), itunesFlag)
+                    playPlaylist(opj(plv.ROOTDIR, plv.tagToPlaylist[tname]), plv.itunes_flag)
                 plv.continueFlag = True
                 return
             else:
@@ -513,7 +513,7 @@ def cmd_p(buf):
         plv.continueFlag = True
         return
     if playAll and plv.lenrr > 0 and not plv.directorySearch:
-        if playSongs(plv.rr, not nosortFlag, itunesFlag):
+        if playSongs(plv.rr, not nosortFlag, plv.itunes_flag):
             print 'Playing files.'
         else:
             print 'Could not play files.'
@@ -522,7 +522,7 @@ def cmd_p(buf):
             addMacro('/ds;/cfds on;"'+plv.rr[num].data['fn']+'";/cfds off;/p --nosort')
             plv.continueFlag = True
             return
-        if playSong(plv.rr[num], not nosortFlag, itunesFlag):
+        if playSong(plv.rr[num], not nosortFlag, plv.itunes_flag):
             print 'Playing file '+plv.rr[num].data['fn']
         else:
             print 'Could not play file.'
@@ -754,6 +754,13 @@ def cmd_rating(buf):
             print name+': new rating '+str(n)+'.'
         r.data['rating'] = n
         plv.ratingdataChanged = True
+
+def cmd_i(buf):
+    if plv.itunes_flag:
+        print 'itunes flag OFF.'
+    else:
+        print 'itunes flag ON.'
+    plv.itunes_flag = not plv.itunes_flag
 
 def ratings_zero_map(x):
     return ratingToString(rating(x))

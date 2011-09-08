@@ -17,7 +17,7 @@ NEWESTPATH = opj(GENRESPLITPATH, '+ NEWEST')
 REALLYNEWESTPATH = opj(GENRESPLITPATH, '+ REALLY NEWEST')
 ALBUMPATH = opj(GENRESPLITPATH, '+ Albums')
 DONTWANTPATH = opj(GENRESPLITPATH, 'z(don\'t want, duplicates or crap)')
-LASTPLSPATH = opj(CDATAPATH, 'last')+plExt
+LASTPLSPATH = opj(CDATAPATH, 'last')+'.m3u'
 IPODBACKUPDIR = opj(ROOTDIR, 'backups')
 EXPORTDIR = opj(IPODBACKUPDIR, 'export')
 BACKUPDIRS = [CDATAPATH, IPODBACKUPDIR]
@@ -44,7 +44,8 @@ localDirfillFile = opj(CDATAPATH, 'local-dirfill.txt')
 #mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC '
 
 mediaplayer = 'open -a vlc.app'
-second_mediaplayer = 'open -a itunes.app'
+#second_mediaplayer = 'open -a itunes.app'
+second_mediaplayer = 'open -a cog.app'
 
 #notepad = 'notepad++'
 notepad = 'open -e'
@@ -120,6 +121,7 @@ lenrr = 0
 orderASpecialSearch = False
 needToCallDirfill = False
 aliasesChanged = False
+itunes_flag = False
 
 INITIALIZED = True
 MENU_AVAILABLE = False
