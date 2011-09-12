@@ -32,8 +32,11 @@ def recurlistHelper(d, basicInfo):
                 #exclude mac's stupid ._ files
                 if os.path.basename(f).startswith('._'):
                     print 'Found/removing mac fake file: '+f
-                    s = 'rm "'+f+'"'
-                    os.system(s)
+                    try:
+                        subprocess.call(['rm',f])
+                    except:
+                        print 'Could not remove file: '+f
+                        continue
                 else:
                     if basicInfo:
                         datalist = [f]

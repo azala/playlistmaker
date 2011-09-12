@@ -743,6 +743,11 @@ def cmd_newhelper(buf):
         print 'No results. Reverting to last search.'
 
 def cmd_rating(buf):
+    #floor option
+    floorFlag = False
+    if '-f ' in buf[0]:
+        buf[0] = buf[0].replace('-f ','',1)
+        floorFlag = True
     parsed = parseCmd(buf[0])
     bl = len(parsed)
     try:
@@ -761,10 +766,12 @@ def cmd_rating(buf):
         oldrating = r.data['rating']
         name = r.data['fn']
         if oldrating != 0:
-            print name+': changed from '+str(oldrating)+' to '+str(n)+'.'
+            cn = max(n, oldrating)
+            print name+': changed from '+str(oldrating)+' to '+str(cn)+'.'
         else:
-            print name+': new rating '+str(n)+'.'
-        r.data['rating'] = n
+            cn = n
+            print name+': new rating '+str(cn)+'.'
+        r.data['rating'] = cn
         plv.ratingdataChanged = True
 
 def cmd_i(buf):
