@@ -362,7 +362,7 @@ def doTheCommand(x, cmdShortString, lbuf = [None]):
     return b
 
 def cmd_automp(buf):
-    addMacro('/over 6;/tag mp;/over 1;/tag np')
+    addMacro('/kill mp -i;/over 6;/tag mp;/kill np -i;/over 1;/tag np')
 
 def cmd_this(lbuf):
     addMacro('/back 0')
@@ -765,11 +765,12 @@ def cmd_rating(buf):
     for r in pickList:
         oldrating = r.data['rating']
         name = r.data['fn']
-        if oldrating != 0:
+        cn = n
+        if floorFlag:
             cn = max(n, oldrating)
+        if oldrating != 0:
             print name+': changed from '+str(oldrating)+' to '+str(cn)+'.'
         else:
-            cn = n
             print name+': new rating '+str(cn)+'.'
         r.data['rating'] = cn
         plv.ratingdataChanged = True

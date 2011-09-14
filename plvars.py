@@ -50,7 +50,8 @@ second_mediaplayer = 'open -a cog.app'
 #notepad = 'notepad++'
 notepad = 'open -e'
 extns = ['mp3','wav','aac','ogg','flac','wma','m4a']
-excludedirs = [DONTWANTPATH,
+excludedirs = [opj(ROOTDIR, '.Trashes'),
+               DONTWANTPATH,
                opj(GENRESPLITPATH, 'other'),
                opj(ROOTDIR, '.rockbox'),
                MOVEDPATH,
