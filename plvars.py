@@ -46,6 +46,7 @@ localDirfillFile = opj(CDATAPATH, 'local-dirfill.txt')
 mediaplayer = 'open -a vlc.app'
 #second_mediaplayer = 'open -a itunes.app'
 second_mediaplayer = 'open -a cog.app'
+redirect_stderr = '2> /dev/null'
 
 #notepad = 'notepad++'
 notepad = 'open -e'

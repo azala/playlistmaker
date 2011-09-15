@@ -311,5 +311,5 @@ def unorm(s):
     return unicodedata.normalize(plv.cEncoding, s)
     
 def killVLC():
-    os.system("kill `ps aux | grep /Applications/VLC.app/Contents/MacOS/VLC | awk '{print $2}'` 2> /dev/null")
+    os.system("kill `ps aux | grep /Applications/VLC.app/Contents/MacOS/VLC | awk '{print $2}'` "+plv.redirect_stderr)
     
