@@ -1248,7 +1248,7 @@ def main():
         doBackup(['-doe'])
     else:
         if plv.NOIPODMODE:
-            print 'No IPOD found, skipping backup.'
+            print 'No IPOD found, skipping backup. (!!!)'
         else:
             print 'No autobackup needed.'
         
