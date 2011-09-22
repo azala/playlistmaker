@@ -7,6 +7,7 @@ cache
 check: show files in dirfill that don't exist
 cfds
 dates: show file creation dates
+dc: disconnect ipod as well
 dir: <n> opens explorer to nth result's directory
 ds: toggle directory search flag or <name> do a directory search
 fmove

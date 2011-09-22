@@ -305,6 +305,11 @@ def writetags():
         countModifiedTags = len(plv.tags)
     else:
         countModifiedTags = len(filter(lambda x: x.data['songs'] != [] and x in plv.invalidateTheseTags, plv.tags))
+    ipod_exists = True
+    #----check ipod before writing playlists
+    if not os.path.exists(plv.ROOTDIR):
+            print 'iPod missing ('+plv.ROOTDIR+').'
+            ipod_exists = False
     for t in sortedTags():
         tname = t.data['name']
         tsongs = t.data['songs']
@@ -315,10 +320,8 @@ def writetags():
         tif.write((tname+'\t'+curPlaylistName+'\r\n').encode('utf'))
         if not plv.invalidateAllTags and t not in plv.invalidateTheseTags:
             continue
-        #----check ipod before writing playlists
-        if not os.path.exists(plv.ROOTDIR):
-            print 'iPod missing ('+plv.ROOTDIR+').'
-            return
+        elif not ipod_exists:
+            continue
         else:
             pf = open(opj(plv.ROOTDIR, curPlaylistName), 'wb')
             tsongs.sort(key=lambda x: x.data['sk'])
@@ -940,6 +943,10 @@ def cmd_guess(buf):
         else:
             print 'Guessed tags: '+', '.join(map(operator.itemgetter(0), l))
             print ''
+
+def cmd_dc(buf):
+    os.system('disk IPOD')
+    addMacro('/ns')
 
 '''
 
