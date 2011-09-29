@@ -945,6 +945,7 @@ def cmd_guess(buf):
             print ''
 
 def cmd_dc(buf):
+    killVLC()
     os.system('disk IPOD')
     addMacro('/ns')
 
