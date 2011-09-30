@@ -365,7 +365,7 @@ def doTheCommand(x, cmdShortString, lbuf = [None]):
     return b
 
 def cmd_automp(buf):
-    addMacro('/kill mp -i;/over 6;/tag mp;/kill np -i;/over 1;/tag np')
+    addMacro('/kill na -i;-"'+plv.ALBUMPATH+';/tag na";/kill mp -i;/over 6;/tag mp;/kill np -i;/over 1;/tag np')
 
 def cmd_this(lbuf):
     addMacro('/back 0')
@@ -882,15 +882,15 @@ def cmd_info(buf):
     print 'rptr: '+str(plv.rptr)
     
 def cmd_guess(buf):
-    parsed = parseCmd(buf[0])
-    lp = len(parsed)
+    optionlist = ['-a','-m']
+    parsed = parseCmdWithOptions(buf[0], optionlist)
     APPLYING_TAGS = False
     MOVING_FILES = False
-    if '+a' in parsed:
-        print 'OPTION +a: Applying tags'
+    if '-a' in parsed[0]:
+        print 'OPTION -a: Applying tags'
         APPLYING_TAGS = True
-    if '+m' in parsed:
-        print 'OPTION +m: Moving files'
+    if '-m' in parsed[0]:
+        print 'OPTION -m: Moving files'
         MOVING_FILES = True
     #else:
     #    print 'Bad arguments to "guess".'
@@ -949,41 +949,6 @@ def cmd_dc(buf):
     os.system('disk IPOD')
     addMacro('/ns')
 
-'''
-
-def inexHelper(buf):
-    parsed = parseCmd(buf[0])
-    lp = len(parsed)
-    if lp == 0:
-        print 'Using export dir "default".'
-        return 'default'
-    elif lp != 1:
-        print 'Usage: /export <name>', 'which is the folder you want to export to.'
-        return ''
-    return parsed[0]
-    
-these should not exist, because they should be executed outside the scope of the program.
-
-def cmd_export(buf):
-    parsed = [inexHelper(buf)]
-    if parsed[0] == '':
-        return;
-    dir = opj(plv.EXPORTDIR,parsed[0])
-    for s in ['mkdir -p "'+dir+'"',
-              'cp '+opj('"'+plv.CDATAPATH+'"','*.txt')+' "'+dir+'"'
-              ]:
-        print s
-        os.system(s)
-        
-def cmd_import(buf):
-    parsed = [inexHelper(buf)]
-    if parsed[0] == '':
-        return;
-    dir = opj(plv.EXPORTDIR,parsed[0])
-    for s in ['cp '+opj('"'+dir+'"','*.txt')+' "'+plv.CDATAPATH+'"']:
-        print s
-        os.system(s)
-'''
 #----
 
 def boolstr(b):
@@ -1070,6 +1035,10 @@ def parseCmd(s, *flags):
         return pcr.terms, pcr.negTerms
     else:
         return pcr.terms
+    
+def parseCmdWithOptions(s, optionlist, *flags):
+    ol = filter(lambda x: x in s, s)
+    return [ol] + parseCmd(s, *flags)
 
 #parsing within-list numerical selections
 def parseSelect(s, mini, maxi):
