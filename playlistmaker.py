@@ -554,24 +554,37 @@ def cmd_dates(buf):
         print bracketNum(ctr) + s
         ctr += 1
 
+def burn_options(optionlist, s):
+    l = s.split(' ')
+    return ' '.join([x for x in l if x not in optionlist])
+
 def cmd_dir(buf):
+    optionlist = ['--local','-l']
+    parsed, optionlist = parseCmdWithOptions(buf[0], optionlist)
+    uselocal = not plv.directorySearch and ('--local' in optionlist or '-l' in optionlist)
+    if uselocal:
+        print 'Using a local copy.'
     if plv.lenrr < 1:
         print 'Need a file selected.'
         plv.continueFlag = True
         return
     n = -1
     try:
-        n = int(buf[0])-1
+        n = int(parsed[0])-1
     except:
         pass
     if n < 0 or n > plv.lenrr-1:
-        print 'Bad index: '+buf[0]+'\r\nDefaulting to first element.'
+        print 'Bad index, defaulting to first element.'
         n = 0
+    if not uselocal:
+        s = plv.rr[n].data['fn']
+    else:
+        s = plv.rr[n].data['locals'][0]
     if plv.directorySearch:
-        os.system('open "'+os.path.dirname(plv.rr[n].data['fn'])+'"')
+        os.system('open "'+os.path.dirname(s)+'"')
         print 'Showing directory.'
     else:
-        os.system('open "'+os.path.dirname(plv.rr[n].data['fn'])+'"')
+        os.system('open "'+os.path.dirname(s)+'"')
         print 'Showing parent directory.'
 
 def cmd_rn(buf):
@@ -883,13 +896,13 @@ def cmd_info(buf):
     
 def cmd_guess(buf):
     optionlist = ['-a','-m']
-    parsed = parseCmdWithOptions(buf[0], optionlist)
+    parsed, optionlist = parseCmdWithOptions(buf[0], optionlist)
     APPLYING_TAGS = False
     MOVING_FILES = False
-    if '-a' in parsed[0]:
+    if '-a' in optionlist:
         print 'OPTION -a: Applying tags'
         APPLYING_TAGS = True
-    if '-m' in parsed[0]:
+    if '-m' in optionlist:
         print 'OPTION -m: Moving files'
         MOVING_FILES = True
     #else:
@@ -1037,8 +1050,9 @@ def parseCmd(s, *flags):
         return pcr.terms
     
 def parseCmdWithOptions(s, optionlist, *flags):
-    ol = filter(lambda x: x in s, s)
-    return [ol] + parseCmd(s, *flags)
+    ol = filter(lambda x: x in s, optionlist)
+    s = burn_options(ol, s)
+    return parseCmd(s, *flags), ol
 
 #parsing within-list numerical selections
 def parseSelect(s, mini, maxi):
