@@ -268,6 +268,9 @@ def readLocalSongs():
         if shortName in locals:
             s.data['locals'].append(locals[shortName])
 
+def writeHistory():
+    readline.write_history_file(plv.historyFile)
+
 #stuff you might search for:
 #doWrite, writeout
 def writetags():
@@ -758,6 +761,9 @@ def cmd_newhelper(buf):
     else:
         print 'No results. Reverting to last search.'
 
+def cmd_tap(buf):
+    addMacro('/rating -f 1')
+
 def cmd_rating(buf):
     #floor option
     floorFlag = False
@@ -1203,6 +1209,11 @@ def main():
     if not checkLock():
         waitAtEnd()
         return
+    if os.path.exists(plv.historyFile):
+        readline.read_history_file(plv.historyFile)
+        print 'History contains '+`readline.get_current_history_length()`+' entries.'
+    else:
+        print 'History file not found.'
     plv.NOIPODMODE = not os.path.exists(plv.ROOTDIR)
     os.system(os.path.join(plv.PLMAKERDIR,'killdotfiles.py'))
     plv.dirFillLines = dirFillToList()
@@ -1332,7 +1343,7 @@ def main():
                     plv.rr = plv.lines
             newSearch(orderSearch(x, plv.rr))
             plv.allowRefine = True
-    
+    writeHistory()
     if not nothingToDo() and plv.saveAtEnd:
         print '\nWriting tags & playlists...'
         writetags()

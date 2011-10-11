@@ -39,6 +39,7 @@ cmdLogFile = opj(CDATAPATH, 'searchlog.txt')
 cmdListFile = opj(CDATAPATH, 'commandlist.txt')
 ratingFile = opj(CDATAPATH, 'ratings.txt')
 localDirfillFile = opj(CDATAPATH, 'local-dirfill.txt')
+historyFile = opj(CDATAPATH, 'command-history.txt')
 
 #mediaplayer = 'winamp'
 #mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC '

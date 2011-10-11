@@ -35,6 +35,7 @@ s
 sl
 tag: <name> apply tag to results
 tags: show each result's tags
+tap: rating floor 1
 this: show results
 time
 wipe: delete all playlist files
