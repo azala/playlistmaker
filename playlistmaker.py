@@ -311,8 +311,8 @@ def writetags():
     ipod_exists = True
     #----check ipod before writing playlists
     if not os.path.exists(plv.ROOTDIR):
-            print 'iPod missing ('+plv.ROOTDIR+').'
-            ipod_exists = False
+        print plv.cIpodMissing
+        ipod_exists = False
     for t in sortedTags():
         tname = t.data['name']
         tsongs = t.data['songs']

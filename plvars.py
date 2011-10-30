@@ -65,6 +65,7 @@ AUTOBACKUP_INTERVAL = 3 #days after last backup before automatically making anot
 #messages
 cBadStr = '- bad string decode -'
 cZeroTime = time.gmtime(0)
+cIpodMissing = 'iPod missing ('+ROOTDIR+').'
 
 #settings
 WAITATEND = False

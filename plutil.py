@@ -189,6 +189,8 @@ def writePls(fn, songlist, sort, localFlag=False):
     else:
         func = lambda x: x.data['fn']
     songNames = unclean(map(func, songlist))
+    if not os.path.exists(plv.ROOTDIR):
+        print plv.cIpodMissing
     fwrite(songNames, fn)
     return localCtr[0]
 
