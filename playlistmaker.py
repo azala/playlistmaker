@@ -499,11 +499,6 @@ def cmd_p(buf):
         quickFlag = True
         bufSplit.remove('--quick')
         buf[0] = ' '.join(bufSplit)
-#    itunesFlag = False
-#    if '-i' in bufSplit:
-#        itunesFlag = True
-#        bufSplit.remove('-i')
-#        buf[0] = ' '.join(bufSplit)
     playAll = (len(buf[0]) == 0 or nosortFlag)
     try:
         if playAll:

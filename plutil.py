@@ -226,8 +226,13 @@ def playPlaylist(fn, itunesFlag):
         mp = plv.mediaplayer
     subprocess.Popen(mp.split(' ')+[fn])    
     
-def playSongs(songs, sort, itunesFlag):
+def playSongs(inputSongs, sort, itunesFlag):
     try:
+        if plv.NOIPODMODE:
+            print 'Only playing local songs.'
+            songs = [song for song in inputSongs if song.data['locals'] != []]
+        else:
+            songs = inputSongs
         localCtr = writePls(plv.LASTPLSPATH, songs, sort, localFlag=True)
         print str(localCtr)+' local files used. (%.0f%%)' % ((localCtr*100)/float(len(songs)))
         killVLC()
