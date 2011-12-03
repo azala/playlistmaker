@@ -963,6 +963,13 @@ def cmd_dc(buf):
     os.system('disk IPOD')
     addMacro('/ns')
 
+def cmd_sys(buf):
+    #don't parse buf[0]
+    os.system(buf[0])
+
+def cmd_msg(buf):
+    os.system('echo '+buf[0]+' | nc -U ~/vlc.sock')
+
 #----
 
 def boolstr(b):
@@ -1267,7 +1274,10 @@ def main():
             print ''
         plv.lenrr = len(plv.rr)
         x = grabInput(plv.cmdQueue)
-        if not isTheCommand(x, 'move'):
+        #disable lowercasing for these commands
+        b = False
+        b = reduce(lambda a, y: a and not isTheCommand(x, y), [True] + plv.no_lowercase_conversion_commands)  
+        if b:
             x = x.lower()
         if x in plv.quitlist:
             if x == '/ns':

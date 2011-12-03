@@ -46,8 +46,8 @@ historyFile = opj(CDATAPATH, 'command-history.txt')
 #mediaplayer = 'winamp'
 #mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC '
 
-mediaplayer = 'open -a vlc.app'
-#mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC --rc-unix ~/vlc.sock --rc-fake-tty'
+#mediaplayer = 'open -a vlc.app'
+mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC --rc-unix ~/vlc.sock --rc-fake-tty'# > /dev/null &'
 #second_mediaplayer = 'open -a itunes.app'
 second_mediaplayer = 'open -a cog.app'
 redirect_stderr = '2> /dev/null'
@@ -61,6 +61,7 @@ excludedirs = [opj(ROOTDIR, '.Trashes'),
                opj(ROOTDIR, '.rockbox'),
                MOVEDPATH,
                IPODBACKUPDIR]
+no_lowercase_conversion_commands = ['move','sys','msg']
 
 FUNC_PREFIX = 'cmd_'
 AUTOBACKUP_INTERVAL = 3 #days after last backup before automatically making another

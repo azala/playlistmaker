@@ -19,6 +19,7 @@ kill: <name> remove tag from all files
 list: show all tags
 log: open logfile
 move
+msg: <stuff> send message to vlc rc interface
 new: <n> update newest playlist to have non-album files less than n days old
 newhelper
 over: <n> show all files with rating >= n
@@ -33,6 +34,7 @@ save: <name> saves last-played results to a file
 show
 s
 sl
+sys: <stuff> execute bash command
 tag: <name> apply tag to results
 tags: show each result's tags
 tap: rating floor 1
