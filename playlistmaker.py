@@ -968,7 +968,10 @@ def cmd_sys(buf):
     os.system(buf[0])
 
 def cmd_msg(buf):
-    os.system('echo '+buf[0]+' | nc -U ~/vlc.sock')
+    os.system('echo '+buf[0]+' | nc -U '+plv.VLCSOCK)
+
+def cmd_m(buf):
+    cmd_msg(buf)
 
 #----
 

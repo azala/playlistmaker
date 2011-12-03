@@ -19,6 +19,7 @@ kill: <name> remove tag from all files
 list: show all tags
 log: open logfile
 move
+m
 msg: <stuff> send message to vlc rc interface
 new: <n> update newest playlist to have non-album files less than n days old
 newhelper
