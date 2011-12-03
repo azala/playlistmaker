@@ -241,6 +241,8 @@ def playSongs(inputSongs, sort, itunesFlag):
         else:
             mp = plv.mediaplayer
         subprocess.Popen(mp.split(' ')+[plv.LASTPLSPATH])
+#        print mp.split(' ')+[plv.LASTPLSPATH]
+#        os.system(mp+' '+plv.LASTPLSPATH+' &')
         return True
     except:
         return False

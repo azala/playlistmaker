@@ -26,6 +26,8 @@ SETPATH = opj(GENRESPLITPATH, '+ sets')
 MOVEDPATH = opj(ROOTDIR, 'moved')
 DESKTOP = os.path.expanduser('~/Desktop')
 LOCALSONGSPATH = opj(DESKTOP,'+ MUSIC')
+MOVESTUFFDIRS = [DESKTOP,
+                 os.path.expanduser('~/Downloads')];
 
 lock_file = opj(CDATAPATH, 'lock')
 preprocess_file = opj(CDATAPATH, 'preprocess.txt')
@@ -45,6 +47,7 @@ historyFile = opj(CDATAPATH, 'command-history.txt')
 #mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC '
 
 mediaplayer = 'open -a vlc.app'
+#mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC --rc-unix ~/vlc.sock --rc-fake-tty'
 #second_mediaplayer = 'open -a itunes.app'
 second_mediaplayer = 'open -a cog.app'
 redirect_stderr = '2> /dev/null'

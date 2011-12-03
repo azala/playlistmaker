@@ -6,7 +6,7 @@ import plvars as plv
 #l = list(filter(lambda x: x.endswith('.mp3'), os.listdir(DESKTOP)))
 #for fn in l:
 go = True
-for p in [plv.NEWESTPATH, plv.REALLYNEWESTPATH, plv.DESKTOP]:
+for p in [plv.NEWESTPATH, plv.REALLYNEWESTPATH] + plv.MOVESTUFFDIRS:
     if not os.path.exists(p):
         print 'Not found: '+p
         go = False
@@ -16,8 +16,9 @@ if '-nc' in sys.argv:
     doCopy = False
 if go:
     redir = ' '+plv.redirect_stderr
-    if doCopy:
-        os.system('cp "'+plv.DESKTOP+'/"*.mp3 "'+plv.NEWESTPATH+'"'+redir)
-    os.system('mv "'+plv.DESKTOP+'/"*.mp3 "'+plv.LOCALSONGSPATH+'"'+redir)
+    for msd in plv.MOVESTUFFDIRS:  
+        if doCopy:
+            os.system('cp "'+msd+'/"*.mp3 "'+plv.NEWESTPATH+'"'+redir)
+        os.system('mv "'+msd+'/"*.mp3 "'+plv.LOCALSONGSPATH+'"'+redir)
     os.system('cp "'+plv.REALLYNEWESTPATH+'/"*.mp3 "'+plv.LOCALSONGSPATH+'"'+redir)
     os.system('mv "'+plv.REALLYNEWESTPATH+'/"*.mp3 "'+plv.NEWESTPATH+'"'+redir)

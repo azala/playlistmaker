@@ -14,7 +14,7 @@ def altRename(old, new):
     if RENAME:
         try:
             os.rename(old, new)
-            print new
+            print 'Successful rename: '+new
         except:
             print 'Failed rename: '+new
         
@@ -66,6 +66,8 @@ def convert(s):
     if s != ret:
         altRename(s, ret)
         return True
+    else:
+        print 'No rename needed: '+s
     return False
 
 def renameFiles(d, maxmatches, ctr):
