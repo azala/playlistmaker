@@ -270,6 +270,8 @@ def readLocalSongs():
 
 def writeHistory():
     readline.write_history_file(plv.historyFile)
+    temp = plv.historyFile+'_TEMP'
+    os.system('cat '+plv.historyFile+' | egrep -v "/m|//|/wn" > '+temp+'; mv '+temp+' '+plv.historyFile)
 
 #stuff you might search for:
 #doWrite, writeout

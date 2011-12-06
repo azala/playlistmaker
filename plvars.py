@@ -64,7 +64,7 @@ excludedirs = [opj(ROOTDIR, '.Trashes'),
 no_lowercase_conversion_commands = ['move','sys','msg']
 FUNC_PREFIX = 'cmd_'
 AUTOBACKUP_INTERVAL = 3 #days after last backup before automatically making another
-VLCSOCK_DELAY = 0.05 #sleep time between the call to open vlc and the call to play
+VLCSOCK_DELAY = 0.1 #sleep time between the call to open vlc and the call to play
 
 #messages
 cBadStr = '- bad string decode -'
