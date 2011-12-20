@@ -132,6 +132,7 @@ needToCallDirfill = False
 aliasesChanged = False
 itunes_flag = False
 cur_autotag_index = -1
+autotag_saved_search = []
 
 INITIALIZED = True
 MENU_AVAILABLE = False

@@ -105,6 +105,11 @@ class SongData(object):
             artist,temp,title = self.data['sk'].partition('-')
             return artist.strip(),title.strip()
         return ('','')
+    def hasNoNonTrivialTags(self):
+        for t in self.data['tags']:
+            if t.data['name'] not in plv.TRIVIAL_TAGS:
+                return False
+        return True
             
 def getSongs(attrName, attrValue, songs):
     return filter(lambda x: x.data[attrName] == attrValue, songs)

@@ -373,32 +373,41 @@ def doTheCommand(x, cmdShortString, lbuf = [None]):
 def cmd_automp(buf):
     addMacro('/kill na -i;-"'+plv.ALBUMPATH+';/tag na";/kill mp -i;/over 6;/tag mp;/kill np -i;/over 1;/tag np')
 
-def set_autotag_index(n):
-    plv.cur_autotag_index = n
-    x = plv.rr[n].getArtistAndTitle()
-    print '\n[%d] '%(n+1)+x[0]+' - '+x[1]
-    print ', '.join(tagsToNames(plv.rr[n].data['tags']))
+def increment_autotag_index():
+    while True:
+        plv.cur_autotag_index += 1
+        n = plv.cur_autotag_index
+        if n >= len(plv.autotag_saved_search):
+            return False
+        if plv.autotag_saved_search[n].hasNoNonTrivialTags():
+            break
+    print '[%d] '%(n+1)+plv.autotag_saved_search[n].data['fn']
+    print ', '.join(tagsToNames(plv.autotag_saved_search[n].data['tags']))
+    return True
 
 def cmd_at(buf):
     optionlist = ['-s']
     pcr, optionlist = parseCmdWithOptions(buf[0], optionlist)
+    if plv.directorySearch:
+        print 'Can\'t autotag directories.'
     if '-s' not in optionlist: #skip macro
-        addMacro('"'+plv.NEWESTPATH+'";/at -s;')
+        addMacro('"'+plv.NEWESTPATH+'";/at -s')
     else:
         if len(plv.rr) == 0:
             print 'Can\'t do much with nothing.'
             return
         Shell.openShell('autotag')
         print 'Opening autotag shell.'
-        set_autotag_index(0)
+        plv.cur_autotag_index = -1
+        plv.autotag_saved_search = plv.rr
+        increment_autotag_index()
         
 def autotag_handler(x):
     pcr = parseCmdHelper(x)
     for t in pcr.terms:
-        doTag(t, [plv.rr[plv.cur_autotag_index]])
-    if plv.cur_autotag_index < len(plv.rr):
-        set_autotag_index(plv.cur_autotag_index + 1)
-    else:
+        doTag(t, [plv.autotag_saved_search[plv.cur_autotag_index]])
+        print
+    if not increment_autotag_index():
         print 'Reached the end, exiting autotag.'
         addMacro('\q')
 
@@ -410,7 +419,11 @@ def cmd_q(buf):
         print 'That doesn\'t do anything right now.'
 
 def cmd_this(lbuf):
-    addMacro('/back 0')
+    if Shell.curShell().id == 'autotag':
+        plv.cur_autotag_index -= 1
+        increment_autotag_index()
+    else:
+        addMacro('/back 0')
 
 def cmd_cache(buf):
     pcr = parseCmdHelper(buf[0])
@@ -714,7 +727,7 @@ def cmd_show(buf):
 
 def cmd_s(buf):
     if Shell.curShell().id == 'autotag':
-        set_autotag_index(plv.cur_autotag_index + 1)
+        increment_autotag_index()
     else:
         cmd_show(buf)
 
