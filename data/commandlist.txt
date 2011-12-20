@@ -1,0 +1,45 @@
+alias: <s1> <s2> tag <s1> can be referenced by an alternate name <s2>.
+automp: sets mp = /over 5 and np = /over 1
+back: <n> go back n searches
+backup: make backups of important files
+banish
+cache
+check: show files in dirfill that don't exist
+cfds
+dates: show file creation dates
+dc: disconnect ipod as well
+dir: <n> opens explorer to nth result's directory
+ds: toggle directory search flag or <name> do a directory search
+fmove
+fwd: <n> go forward n searches
+guess
+i: toggles itunes as media player
+info
+kill: <name> remove tag from all files
+list: show all tags
+log: open logfile
+move
+m
+msg: <stuff> send message to vlc rc interface
+new: <n> update newest playlist to have non-album files less than n days old
+newhelper
+over: <n> show all files with rating >= n
+p: play results or <playlist> play this playlist or <number> play this index of results
+pp: same as /p 1
+rating: <n> set results' ratings to n
+ratings: shows results' ratings
+rm: <name> remove tag from results
+rn: <a> <b> rename tag a to b
+same: apply last tag
+save: <name> saves last-played results to a file
+show
+s
+sl
+sys: <stuff> execute bash command
+tag: <name> apply tag to results
+tags: show each result's tags
+tap: rating floor 1
+this: show results
+time
+wipe: delete all playlist files
+wn: save all operations
