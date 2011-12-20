@@ -65,7 +65,7 @@ no_lowercase_conversion_commands = ['move','sys','msg']
 FUNC_PREFIX = 'cmd_'
 AUTOBACKUP_INTERVAL = 3 #days after last backup before automatically making another
 VLCSOCK_DELAY = 0.2 #sleep time between the call to open vlc and the call to play
-TRIVIAL_TAGS = ['non-album', 'most popular', 'not as popular']
+TRIVIAL_TAGS = ['non-album', 'most popular', 'not as popular', 'concentration']
 
 #messages
 cBadStr = '- bad string decode -'

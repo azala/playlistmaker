@@ -302,7 +302,7 @@ def writetags():
         print 'Wrote rating data.'
     plv.ratingdataChanged = False
     #----write playlists
-    if plv.invalidateAllTags:
+    if plv.invalidateAllTags and not plv.NOIPODMODE:
         wipePlaylists()
     ctr = 0
     playlistCtr = 0
@@ -373,27 +373,31 @@ def doTheCommand(x, cmdShortString, lbuf = [None]):
 def cmd_automp(buf):
     addMacro('/kill na -i;-"'+plv.ALBUMPATH+';/tag na";/kill mp -i;/over 6;/tag mp;/kill np -i;/over 1;/tag np')
 
+def set_autotag_index(n):
+    plv.cur_autotag_index = n
+    x = plv.rr[n].getArtistAndTitle()
+    print '\n[%d] '%(n+1)+x[0]+' - '+x[1]
+    print ', '.join(tagsToNames(plv.rr[n].data['tags']))
+
 def cmd_at(buf):
     optionlist = ['-s']
     pcr, optionlist = parseCmdWithOptions(buf[0], optionlist)
     if '-s' not in optionlist: #skip macro
-        addMacro(plv.NEWESTPATH+';/at -s;')
+        addMacro('"'+plv.NEWESTPATH+'";/at -s;')
     else:
         if len(plv.rr) == 0:
             print 'Can\'t do much with nothing.'
             return
         Shell.openShell('autotag')
         print 'Opening autotag shell.'
-        plv.cur_autotag_index = 0
-        print plv.rr[cur_autotag_index].getArtistAndTitle()
+        set_autotag_index(0)
         
 def autotag_handler(x):
     pcr = parseCmdHelper(x)
     for t in pcr.terms:
-        doTag(t, [plv.rr[cur_autotag_index]])
+        doTag(t, [plv.rr[plv.cur_autotag_index]])
     if plv.cur_autotag_index < len(plv.rr):
-        plv.cur_autotag_index += 1
-        print plv.rr[cur_autotag_index].getArtistAndTitle()
+        set_autotag_index(plv.cur_autotag_index + 1)
     else:
         print 'Reached the end, exiting autotag.'
         addMacro('\q')
@@ -710,8 +714,7 @@ def cmd_show(buf):
 
 def cmd_s(buf):
     if Shell.curShell().id == 'autotag':
-        #skip song for autotag
-        pass
+        set_autotag_index(plv.cur_autotag_index + 1)
     else:
         cmd_show(buf)
 
@@ -1335,7 +1338,7 @@ def main():
         plv.orderASpecialSearch = False
         doASelection = False
         plv.continueFlag = False
-        if x != '':
+        if x != '' or Shell.curShell().id != 'autotag': #god what a disgusting hack
             print ''
         else:
             continue
