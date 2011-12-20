@@ -65,6 +65,7 @@ no_lowercase_conversion_commands = ['move','sys','msg']
 FUNC_PREFIX = 'cmd_'
 AUTOBACKUP_INTERVAL = 3 #days after last backup before automatically making another
 VLCSOCK_DELAY = 0.2 #sleep time between the call to open vlc and the call to play
+TRIVIAL_TAGS = ['non-album', 'most popular', 'not as popular']
 
 #messages
 cBadStr = '- bad string decode -'
@@ -80,7 +81,7 @@ NOIPODMODE = False
 #playlists = {} #values are full file names
 #taglists = {} #keys are full file names
 #plkeys = []
-quitlist = ['//', '/q', '/quit', '/exit', '/ns']
+quitlist = ['//', '/quit', '/exit', '/ns']
 helplist = ['?', '/h', '/help']
 lastTag = None
 results = []

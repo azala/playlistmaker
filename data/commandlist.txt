@@ -1,5 +1,6 @@
 alias: <s1> <s2> tag <s1> can be referenced by an alternate name <s2>.
 automp: sets mp = /over 5 and np = /over 1
+at: auto-tag feature (new!)
 back: <n> go back n searches
 backup: make backups of important files
 banish
@@ -25,6 +26,7 @@ new: <n> update newest playlist to have non-album files less than n days old
 newhelper
 over: <n> show all files with rating >= n
 p: play results or <playlist> play this playlist or <number> play this index of results
+q
 pp: same as /p 1
 rating: <n> set results' ratings to n
 ratings: shows results' ratings

@@ -4,6 +4,7 @@ import os, datetime, shutil, time, subprocess, plutil, operator, readline
 from command import *
 import plvars as plv
 from plutil import *
+from shell import *
 
 def nothingToDo():
     return not plv.invalidateAllTags and \
@@ -372,6 +373,22 @@ def doTheCommand(x, cmdShortString, lbuf = [None]):
 def cmd_automp(buf):
     addMacro('/kill na -i;-"'+plv.ALBUMPATH+';/tag na";/kill mp -i;/over 6;/tag mp;/kill np -i;/over 1;/tag np')
 
+def cmd_at(buf):
+    Shell.openShell('autotag')
+    print 'Opening autotag shell.'
+
+def autotag_handler(x):
+    pcr = parseCmdHelper(x)
+    s = ';'.join(map(lambda t: '/tag '+t, pcr.terms))
+    print s
+
+def cmd_q(buf):
+    if Shell.curShell().id == 'autotag':
+        print 'Exiting autotag shell.'
+        Shell.closeShell()
+    else:
+        print 'That doesn\'t do anything right now.'
+
 def cmd_this(lbuf):
     addMacro('/back 0')
 
@@ -673,7 +690,11 @@ def cmd_show(buf):
         plv.rr = Tag.tagsByName[tagName].data['songs']
 
 def cmd_s(buf):
-    cmd_show(buf)
+    if Shell.curShell().id == 'autotag':
+        #skip song for autotag
+        pass
+    else:
+        cmd_show(buf)
 
 def cmd_fwd(buf):
     traverseCmd(buf[0], 1)
@@ -1202,13 +1223,14 @@ def rating(song):
                                                 
 def grabInput(cq):
     notfirst = True
+    shellString = Shell.curShell().id + '>> '
     if cq == []:
-        instr = raw_input('>> ')
+        instr = raw_input(shellString)
         cq += instr.split(';')
         notfirst = False
     x = cq.pop(0).strip()
     if notfirst:
-        print '>> '+x
+        print shellString+x
     return x
 
 def main():
@@ -1260,7 +1282,8 @@ def main():
             print 'No IPOD found, skipping backup. (!!!)'
         else:
             print 'No autobackup needed.'
-        
+    
+    Shell.openShell('')
     buf = [None]
     firstRun = True
     while True:
@@ -1326,6 +1349,8 @@ def main():
                 refinedSearch = True
         elif x[0] == '/':
             print 'Failed command?'
+        elif Shell.curShell().id == 'autotag':
+            autotag_handler(x)
         else:
             orderASearch = True
         if doASelection:
