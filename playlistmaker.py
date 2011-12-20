@@ -374,13 +374,29 @@ def cmd_automp(buf):
     addMacro('/kill na -i;-"'+plv.ALBUMPATH+';/tag na";/kill mp -i;/over 6;/tag mp;/kill np -i;/over 1;/tag np')
 
 def cmd_at(buf):
-    Shell.openShell('autotag')
-    print 'Opening autotag shell.'
-
+    optionlist = ['-s']
+    pcr, optionlist = parseCmdWithOptions(buf[0], optionlist)
+    if '-s' not in optionlist: #skip macro
+        addMacro(plv.NEWESTPATH+';/at -s;')
+    else:
+        if len(plv.rr) == 0:
+            print 'Can\'t do much with nothing.'
+            return
+        Shell.openShell('autotag')
+        print 'Opening autotag shell.'
+        plv.cur_autotag_index = 0
+        print plv.rr[cur_autotag_index].getArtistAndTitle()
+        
 def autotag_handler(x):
     pcr = parseCmdHelper(x)
-    s = ';'.join(map(lambda t: '/tag '+t, pcr.terms))
-    print s
+    for t in pcr.terms:
+        doTag(t, [plv.rr[cur_autotag_index]])
+    if plv.cur_autotag_index < len(plv.rr):
+        plv.cur_autotag_index += 1
+        print plv.rr[cur_autotag_index].getArtistAndTitle()
+    else:
+        print 'Reached the end, exiting autotag.'
+        addMacro('\q')
 
 def cmd_q(buf):
     if Shell.curShell().id == 'autotag':
@@ -422,20 +438,8 @@ def cmd_cache(buf):
             os.system(s)
     print 'Done.'
     
-
-def cmd_tag(buf):
-    plv.lastCmdWasSearch = False
-    pcr = parseCmdHelper(buf[0])
-    l = len(pcr.terms)
-    if l == 2:
-        try:
-            n = int(pcr.terms[0])
-            rrhelper = [plv.rr[n-1]]
-        except:
-            rrhelper = plv.rr
-    else:
-        rrhelper = plv.rr
-    tname = getAlias(pcr.terms[l-1].lower())
+#assuming a string (not Tag object) and a list of Song objects are passed in.
+def doTag(tname, songs):
     if '"' in tname or "'" in tname:
         print 'Bad tag name.'
         return
@@ -451,7 +455,7 @@ def cmd_tag(buf):
     print 'Applying tag: '+tname
     invalidatedAlready = False
     ctr = 0
-    for song in rrhelper:
+    for song in songs:
         plv.didAnything = True
         if t in plv.tags:
             if song not in t.data['songs']:
@@ -471,6 +475,21 @@ def cmd_tag(buf):
             ctr += 1
             plv.tags.append(t)
     print 'Applied tag to '+str(ctr)+' items.'
+
+def cmd_tag(buf):
+    plv.lastCmdWasSearch = False
+    pcr = parseCmdHelper(buf[0])
+    l = len(pcr.terms)
+    if l == 2:
+        try:
+            n = int(pcr.terms[0])
+            rrhelper = [plv.rr[n-1]]
+        except:
+            rrhelper = plv.rr
+    else:
+        rrhelper = plv.rr
+    tname = getAlias(pcr.terms[l-1].lower())
+    doTag(tname, rrhelper)
 
 def cmd_same(buf):
     if plv.lastTag != None:
