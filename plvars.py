@@ -46,8 +46,8 @@ historyFile = opj(CDATAPATH, 'command-history.txt')
 VLCSOCK = '~/vlc.sock' #rc interface socket
 #mediaplayer = 'winamp'
 #mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC '
-#mediaplayer = 'open -a vlc.app'
-mediaplayer = '/Applications/VLC.app/Contents/MacOS/VLC --rc-unix '+VLCSOCK+' --rc-fake-tty'# > /dev/null &'
+vlc = 'open -a vlc.app'
+vlc_rc = '/Applications/VLC.app/Contents/MacOS/VLC --rc-unix '+VLCSOCK+' --rc-fake-tty'# > /dev/null &'
 #second_mediaplayer = 'open -a itunes.app'
 second_mediaplayer = 'open -a cog.app'
 redirect_stderr = '2> /dev/null'
@@ -75,6 +75,11 @@ cIpodMissing = 'iPod missing ('+ROOTDIR+').'
 #settings
 WAITATEND = False
 NOIPODMODE = False
+USE_VLC_RC = False #use remote control interface
+if USE_VLC_RC:
+    mediaplayer = vlc_rc
+else:
+    mediaplayer = vlc
 
 #variables
 #orphans = []
@@ -133,6 +138,5 @@ aliasesChanged = False
 itunes_flag = False
 cur_autotag_index = -1
 autotag_saved_search = []
-
 INITIALIZED = True
 MENU_AVAILABLE = False

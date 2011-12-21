@@ -457,6 +457,7 @@ def cmd_cache(buf):
     
 #assuming a string (not Tag object) and a list of Song objects are passed in.
 def doTag(tname, songs):
+    tname = getAlias(tname)
     if '"' in tname or "'" in tname:
         print 'Bad tag name.'
         return
@@ -484,8 +485,6 @@ def doTag(tname, songs):
                     invalidatedAlready = True
         else:
             #this can be legitimately hit if you kill a tag, then make it again in the same session
-            #print 'Re-invalidating new tag??'
-            #raise Exception()
             invalidate()
             t.data['songs'].append(song)
             song.data['tags'].append(t)
@@ -505,7 +504,7 @@ def cmd_tag(buf):
             rrhelper = plv.rr
     else:
         rrhelper = plv.rr
-    tname = getAlias(pcr.terms[l-1].lower())
+    tname = pcr.terms[l-1].lower()
     doTag(tname, rrhelper)
 
 def cmd_same(buf):
@@ -1026,7 +1025,10 @@ def cmd_sys(buf):
     os.system(buf[0])
 
 def cmd_msg(buf):
-    os.system('echo '+buf[0]+' | nc -U '+plv.VLCSOCK)
+    if plv.USE_VLC_RC:
+        os.system('echo '+buf[0]+' | nc -U '+plv.VLCSOCK)
+    else:
+        print 'Not using vlc rc interface, so nothing done.'
 
 def cmd_m(buf):
     cmd_msg(buf)

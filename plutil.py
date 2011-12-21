@@ -245,9 +245,12 @@ def playSongs(inputSongs, sort, itunesFlag):
             mp = plv.second_mediaplayer
         else:
             mp = plv.mediaplayer
-        os.system(mp+' '+plv.LASTPLSPATH+' > /dev/null &')
-        time.sleep(plv.VLCSOCK_DELAY) #kludge to make sure vlc is up and running before sending play signal
-        addMacro('/msg play')
+            if plv.USE_VLC_RC:
+                os.system(mp+' '+plv.LASTPLSPATH+' > /dev/null &')
+                time.sleep(plv.VLCSOCK_DELAY) #kludge to make sure vlc is up and running before sending play signal
+                addMacro('/msg play')
+            else:
+                subprocess.Popen(mp.split(' ')+[plv.LASTPLSPATH])
 #        subprocess.Popen(mp.split(' ')+[plv.LASTPLSPATH])
 #        print mp.split(' ')+[plv.LASTPLSPATH]
 #        os.system(mp+' '+plv.LASTPLSPATH+' &')
