@@ -1422,6 +1422,9 @@ def main():
     else:
         print '\nNothing was done. No need to save.'
     saveLog()
+    if plv.AUTO_EXPORT:
+        subprocess.call([opj(plv.PLMAKERDIR, 'export.py'), '-s'])
+        print 'Auto-exported playlistmaker data.'
     print 'Bye!'
     unlock()
     waitAtEnd()

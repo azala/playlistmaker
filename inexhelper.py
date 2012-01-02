@@ -13,6 +13,10 @@ else:
     cmdname = 'export'
 
 lsa = len(sys.argv)
+silentMode = lsa >= 3 and '-s' in sys.argv
+if silentMode:
+    sys.argv.remove('-s')
+    lsa -= 1
 
 if lsa == 2:
     name = 'default'
@@ -20,8 +24,9 @@ elif lsa == 3:
     name = sys.argv[2]
 else:
     sys.exit()
-    
-print 'Using '+cmdname+' dir "'+name+'".'
+ 
+if not silentMode:   
+    print 'Using '+cmdname+' dir "'+name+'".'
 dir = opj(plv.EXPORTDIR,name)
 
 if cmdname == 'export':
@@ -31,4 +36,8 @@ else:
     l = ['cp '+opj('"'+dir+'"','*.txt')+' "'+plv.CDATAPATH+'"']
     
 for item in l:
-    os.system(printret(item))
+    if silentMode:
+        s = item
+    else:
+        s = printret(item)
+    os.system(s)
