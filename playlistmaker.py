@@ -1353,7 +1353,7 @@ def main():
         plv.orderASpecialSearch = False
         doASelection = False
         plv.continueFlag = False
-        if x != '' or Shell.curShell().id != 'autotag': #god what a disgusting hack
+        if x != '': #god what a disgusting hack
             print ''
         else:
             continue
@@ -1423,8 +1423,9 @@ def main():
         print '\nNothing was done. No need to save.'
     saveLog()
     if plv.AUTO_EXPORT:
+        print 'Auto-exported playlistmaker data...',
         subprocess.call([opj(plv.PLMAKERDIR, 'export.py'), '-s'])
-        print 'Auto-exported playlistmaker data.'
+        print 'done.'
     print 'Bye!'
     unlock()
     waitAtEnd()
