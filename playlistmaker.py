@@ -78,8 +78,9 @@ def banishFile(fn):
 
 
 
-def newSearch(newResults):
+def newSearch(newResults, causedByThisSearch=''):
     plv.resultHistory = plv.resultHistory[-1*plv.maxStoredResults+1:] + [newResults]
+    plv.resultHistoryTerms = plv.resultHistoryTerms[-1*plv.maxStoredResults+1:] + [causedByThisSearch]
     plv.resultHistory_DSFlag = plv.resultHistory_DSFlag[-1*plv.maxStoredResults+1:] + [plv.directorySearch]
     #plv.resultHistory_NoSortFlag = plv.resultHistory_NoSortFlag[-1*plv.maxStoredResults+1:] + [plv.nosort]
     plv.rptr = len(plv.resultHistory)-1
@@ -122,7 +123,11 @@ def showSearchList():
             pref = "> "
         else:
             pref = "  "
-        print pref + str(len(plv.resultHistory[i]))
+        if (plv.resultHistory_DSFlag[i]):
+            albumString = " [ALBUM]"
+        else:
+            albumString = ""
+        print pref + str(len(plv.resultHistory[i])) + " " + plv.resultHistoryTerms[i] + albumString
         
 def getAlias(tname, boo = True):
     if tname in Tag.tagsByAlias:
@@ -1418,7 +1423,7 @@ def main():
                     plv.rr = plv.dirlist
                 else:
                     plv.rr = plv.lines
-            newSearch(orderSearch(x, plv.rr))
+            newSearch(orderSearch(x, plv.rr), x)#that last part is so /sl can see the command that caused that search
             plv.allowRefine = True
     writeHistory()
     if not nothingToDo() and plv.saveAtEnd:

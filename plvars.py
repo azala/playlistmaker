@@ -121,6 +121,7 @@ ratingdataChanged = False
 lines = []
 resultHistory = []
 resultHistory_DSFlag = []
+resultHistoryTerms = []
 #resultHistory_NoSortFlag = []
 rptr = -1
 maxStoredResults = 100
