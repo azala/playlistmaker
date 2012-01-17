@@ -48,9 +48,14 @@ def moveFile(src, dst, banish = False):
     if src == dst:
         print 'Failed, both names are the same.'
         return
+#    try:
+#        subprocess.check_call(['move', src, dst], shell=True)
+#    except (subprocess.CalledProcessError, WindowsError) as e:
+#        print 'Move failed: '+str(e)
+#        return
     try:
-        subprocess.check_call(['move', src, dst], shell=True)
-    except (subprocess.CalledProcessError, WindowsError) as e:
+        subprocess.check_call(['mv',src,dst], shell=True)
+    except:
         print 'Move failed: '+str(e)
         return
     song = plv.songDict['fn'][src]
