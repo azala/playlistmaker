@@ -80,7 +80,7 @@ if USE_VLC_RC:
     mediaplayer = vlc_rc
 else:
     mediaplayer = vlc
-AUTO_EXPORT = True
+AUTO_EXPORT = False
 
 #variables
 #orphans = []

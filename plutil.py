@@ -286,11 +286,14 @@ def copy(src, dst):
 def tagListToString(taglist):
     return ', '.join(map(lambda x: x.data['name'], taglist))
 
+def ratingString(r):
+    return "%g" % r
+
 def ratingToString(r):
     if r == 0:
         return ''
     else:
-        return str(r)
+        return ratingString(r)
     
 def callDirfill():
     subprocess.Popen(['python', 'dirfill.py'])

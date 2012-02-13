@@ -16,9 +16,10 @@ if '-nc' in sys.argv:
     doCopy = False
 if go:
     redir = ' '+plv.redirect_stderr
-    for msd in plv.MOVESTUFFDIRS:  
-        if doCopy:
-            os.system('cp "'+msd+'/"*.mp3 "'+plv.NEWESTPATH+'"'+redir)
-        os.system('mv "'+msd+'/"*.mp3 "'+plv.LOCALSONGSPATH+'"'+redir)
-    os.system('cp "'+plv.REALLYNEWESTPATH+'/"*.mp3 "'+plv.LOCALSONGSPATH+'"'+redir)
-    os.system('mv "'+plv.REALLYNEWESTPATH+'/"*.mp3 "'+plv.NEWESTPATH+'"'+redir)
+    for extn in plv.extns:
+        for msd in plv.MOVESTUFFDIRS:  
+            if doCopy:
+                os.system('cp "'+msd+'/"*.'+extn+' "'+plv.NEWESTPATH+'"'+redir)
+            os.system('mv "'+msd+'/"*.'+extn+' "'+plv.LOCALSONGSPATH+'"'+redir)
+        os.system('cp "'+plv.REALLYNEWESTPATH+'/"*.'+extn+' "'+plv.LOCALSONGSPATH+'"'+redir)
+        os.system('mv "'+plv.REALLYNEWESTPATH+'/"*.'+extn+' "'+plv.NEWESTPATH+'"'+redir)

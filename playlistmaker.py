@@ -37,8 +37,8 @@ def readRatingData():
     for l in clean(fread(plv.ratingFile)):
         k, v = l.split('\t')
         k = unorm(k)
-        plv.songDict['fn'][k].data['rating'] = int(v)
-        plv.ratingdata[k] = int(v)
+        plv.songDict['fn'][k].data['rating'] = float(v)
+        plv.ratingdata[k] = float(v)
     print 'Loaded rating data.'
     
 #---FILE MOVE
@@ -837,11 +837,11 @@ def cmd_rating(buf):
     try:
         if bl == 1:
             rrIndex = -1
-            n = int(parsed[0])
+            n = float(parsed[0])
             pickList = plv.rr
         else:
             rrIndex = int(parsed[0])
-            n = int(parsed[1])
+            n = float(parsed[1])
             pickList = [plv.rr[rrIndex-1]]
     except:
         print 'Invalid input.'
@@ -853,9 +853,9 @@ def cmd_rating(buf):
         if floorFlag:
             cn = max(n, oldrating)
         if oldrating != 0:
-            print name+': changed from '+str(oldrating)+' to '+str(cn)+'.'
+            print name+': changed from '+ratingString(oldrating)+' to '+ratingString(cn)+'.'
         else:
-            print name+': new rating '+str(cn)+'.'
+            print name+': new rating '+ratingString(cn)+'.'
         r.data['rating'] = cn
         plv.ratingdataChanged = True
 

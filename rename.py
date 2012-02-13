@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os, sys, re, azutils
+import plvars as plv
 
 RENAME = False
 RECURSIVE = False
