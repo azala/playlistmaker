@@ -880,15 +880,45 @@ def cmd_time(buf):
     default_time_const = 30
     try:
         includeAlbums = False
-        inputl = parseCmd(buf[0])
-        if len(inputl) > 0 and inputl[0] == 'ia':
+        aroundAFile = False
+        noPlayAfter = False
+        
+        optionlist = ['-ia', '-np']
+        inputl, optionlist = parseCmdWithOptions(buf[0], optionlist)
+        
+        if '-ia' in optionlist:
             print 'Including album songs.'
             includeAlbums = True
+        if '-np' in optionlist:
+            print 'Not playing after search.'
+            noPlayAfter = True
+            
+        nthResult = 1
+        if len(inputl) > 0 and inputl[0] == 'a':
+            aroundAFile = True
             inputl = inputl[1:]
-        if len(inputl) == 0:
-            a = fileAge(plv.rr[0].data['fn']).days - default_time_const/2
-            b = a + default_time_const
-            print 'Defaulting to age of first result file.'
+            try:
+                nthResult = int(inputl[0])
+                inputl = inputl[1:]
+                if nthResult < 1 or nthResult > plv.lenrr:
+                    raise
+            except:
+                nthResult = 1
+                print 'Bad arg for time-around, using first result.'
+        
+        if aroundAFile:
+            if len(inputl) > 0:
+                try:
+                    delta = int(inputl[0])
+                    if delta < 0:
+                        raise
+                except:
+                    delta = default_time_const/2
+            else:
+                delta = default_time_const/2
+            a = fileAge(plv.rr[nthResult].data['fn']).days - delta
+            b = a + delta*2
+            print 'Printing songs around result #'+str(nthResult)+'.'
         else:
             a = int(inputl[0])
             try:
@@ -911,7 +941,8 @@ def cmd_time(buf):
     b = datetime.timedelta(days=b)
     plv.rr = filter(lambda x: ageBetween(x.data['fn'], a, b), plv.rr)
     plv.orderASpecialSearch = True
-    addMacro('/p')
+    if not noPlayAfter:
+        addMacro('/p')
     
 def fnFilter_nonSet(song):
     return not song.data['fn'].startswith(plv.SETPATH)
