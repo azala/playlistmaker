@@ -515,7 +515,11 @@ def cmd_tag(buf):
     else:
         rrhelper = plv.rr
     tname = pcr.terms[l-1].lower()
-    doTag(tname, rrhelper)
+    try:
+        n = int(tname)
+        print 'Please don\'t use numbers as tags.'
+    except:
+        doTag(tname, rrhelper)
 
 def cmd_same(buf):
     if plv.lastTag != None:
@@ -788,7 +792,7 @@ def cmd_inv(buf):
     invalidate()
     print 'Invalidated everything.'
     
-def cmd_wn(buf):
+def cmd_w(buf):
     writetags()
 
 def cmd_sl(buf):
@@ -916,7 +920,7 @@ def cmd_time(buf):
                     delta = default_time_const/2
             else:
                 delta = default_time_const/2
-            a = fileAge(plv.rr[nthResult].data['fn']).days - delta
+            a = fileAge(plv.rr[nthResult-1].data['fn']).days - delta
             b = a + delta*2
             print 'Printing songs around result #'+str(nthResult)+'.'
         else:

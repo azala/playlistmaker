@@ -44,4 +44,4 @@ tap: rating floor 1
 this: show results
 time
 wipe: delete all playlist files
-wn: save all operations
+w: save all operations
