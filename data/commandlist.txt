@@ -24,6 +24,7 @@ m
 msg: <stuff> send message to vlc rc interface
 new: <n> update newest playlist to have non-album files less than n days old
 newhelper
+or
 over: <n> show all files with rating >= n
 p: play results or <playlist> play this playlist or <number> play this index of results
 q

@@ -1078,6 +1078,13 @@ def cmd_msg(buf):
 def cmd_m(buf):
     cmd_msg(buf)
 
+def cmd_or(buf):
+    inputl = parseCmd(buf[0])
+    plv.orSearch = True
+    plv.orderASearch = True
+    plv.refinedSearch = True
+    plv.continueFlag = False
+
 #----
 
 def boolstr(b):
@@ -1270,6 +1277,19 @@ def printResults(res):
         print 'This is an ALBUM search.'
     print 'Found '+str(srcCtr)+' items.'
 
+def stringOr(s, pos, neg):
+    s = s.lower()
+    for p in pos:
+        if p != '' and p in s:
+            return True
+    for n in neg:
+        if n != '' and n not in s:
+            return True
+    return False
+
+def orFilterPosNeg(pos, neg):
+    return lambda x: stringOr(x.data['fn'], pos, neg)
+
 def stringContainsPosNotNeg(s, pos, neg):
     s = s.lower()
     for p in pos:
@@ -1283,13 +1303,19 @@ def stringContainsPosNotNeg(s, pos, neg):
 def filterPosNeg(pos, neg):
     return lambda x: stringContainsPosNotNeg(x.data['fn'], pos, neg)
 
-def orderSearch(x, res):
+def orderSearch(x, res, b):
     if res != []:
+        print x
         if x == '':
             filterPN = lambda x: True
         else:
             words, negwords = parseCmd(x, 'pn') #differentiate between positive and negative search terms
-            filterPN = filterPosNeg(words, negwords)
+            if b:
+                print 'bee'
+                filterPN = orFilterPosNeg(words, negwords)
+            else:
+                print 'not bee'
+                filterPN = filterPosNeg(words, negwords)
         if plv.comesFromDirectorySearch or plv.directorySearch:
             res = filter(filterPN, res)
         else:
@@ -1393,11 +1419,12 @@ def main():
             if x == '/ns':
                 plv.saveAtEnd = False
             break
-        orderASearch = False
-        refinedSearch = False
+        plv.orderASearch = False
+        plv.refinedSearch = False
         plv.orderASpecialSearch = False
         doASelection = False
         plv.continueFlag = False
+        plv.orSearch = False
         if x != '': #god what a disgusting hack
             print ''
         else:
@@ -1427,14 +1454,14 @@ def main():
                 print 'Can\'t refine this search.'
                 continue
             else:
-                orderASearch = True
-                refinedSearch = True
+                plv.orderASearch = True
+                plv.refinedSearch = True
         elif x[0] == '/':
             print 'Failed command?'
         elif Shell.curShell().id == 'autotag':
             autotag_handler(x)
         else:
-            orderASearch = True
+            plv.orderASearch = True
         if doASelection:
             if plv.rr != []:
                 ps = parseSelect(sele, 1, plv.lenrr)
@@ -1449,16 +1476,16 @@ def main():
             else:
                 print 'Can\'t select from nothing.'
         if plv.orderASpecialSearch:
-            orderASearch = True
-            refinedSearch = True
+            plv.orderASearch = True
+            plv.refinedSearch = True
             x = ''
-        if orderASearch:
-            if not refinedSearch:
+        if plv.orderASearch:
+            if not plv.refinedSearch:
                 if plv.directorySearch:
                     plv.rr = plv.dirlist
                 else:
                     plv.rr = plv.lines
-            newSearch(orderSearch(x, plv.rr), x)#that last part is so /sl can see the command that caused that search
+            newSearch(orderSearch(x, plv.rr, plv.orSearch), x)#that last part is so /sl can see the command that caused that search
             plv.allowRefine = True
     writeHistory()
     if not nothingToDo() and plv.saveAtEnd:
