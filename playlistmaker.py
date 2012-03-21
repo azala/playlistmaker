@@ -1311,10 +1311,8 @@ def orderSearch(x, res, b):
         else:
             words, negwords = parseCmd(x, 'pn') #differentiate between positive and negative search terms
             if b:
-                print 'bee'
                 filterPN = orFilterPosNeg(words, negwords)
             else:
-                print 'not bee'
                 filterPN = filterPosNeg(words, negwords)
         if plv.comesFromDirectorySearch or plv.directorySearch:
             res = filter(filterPN, res)
