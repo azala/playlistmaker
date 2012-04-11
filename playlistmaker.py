@@ -1305,7 +1305,6 @@ def filterPosNeg(pos, neg):
 
 def orderSearch(x, res, b):
     if res != []:
-        print x
         if x == '':
             filterPN = lambda x: True
         else:
