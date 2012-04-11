@@ -13,6 +13,7 @@ dir: <n> opens explorer to nth result's directory
 ds: toggle directory search flag or <name> do a directory search
 fmove
 fwd: <n> go forward n searches
+goto
 guess
 i: toggles itunes as media player
 info

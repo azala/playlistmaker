@@ -91,7 +91,7 @@ def traverse(n):
         return True
     return False
 
-def traverseCmd(s, parity):
+def traverseCmd(s, parity, doPrintRes):
     if parity == 1:
         ba_string = 'ahead'
     else:
@@ -105,7 +105,8 @@ def traverseCmd(s, parity):
             print 'Moved '+ba_string+' '+str(s)+' searches.'
             plv.directorySearch = plv.resultHistory_DSFlag[plv.rptr]
             #plv.nosort = plv.resultHistory_NoSortFlag[rptr]
-            printResults(mapSongsToNames(readRes()))
+            if (doPrintRes):
+                printResults(mapSongsToNames(readRes()))
         else:
             print 'Couldn\'t move '+ba_string+' '+str(s)+' searches.'
     except:
@@ -511,7 +512,10 @@ def cmd_tag(buf):
             n = int(pcr.terms[0])
             rrhelper = [plv.rr[n-1]]
         except:
-            rrhelper = plv.rr
+            s = '.'+pcr.terms[0]+';/tag '+pcr.terms[1]+';/goto '+str(plv.rptr)
+            addMacro(s)
+            return
+#            rrhelper = plv.rr
     else:
         rrhelper = plv.rr
     tname = pcr.terms[l-1].lower()
@@ -745,10 +749,18 @@ def cmd_s(buf):
         cmd_show(buf)
 
 def cmd_fwd(buf):
-    traverseCmd(buf[0], 1)
+    traverseCmd(buf[0], 1, True)
     
 def cmd_back(buf):
-    traverseCmd(buf[0], -1)
+    traverseCmd(buf[0], -1, True)
+    
+def cmd_goto(buf):
+    n = int(buf[0]) - plv.rptr
+    if n >= 0:
+        parity = 1
+    else:
+        parity = -1
+    traverseCmd(n*parity, parity, False)
 
 def cmd_list(buf):
     print '\t'.join(tagsToNames(plv.tags))
