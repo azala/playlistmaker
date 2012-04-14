@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, datetime, shutil, time, subprocess, plutil, operator, readline
+import os, datetime, shutil, time, subprocess, plutil, operator, readline, rlcompleter
 from command import *
 import plvars as plv
 from plutil import *
@@ -512,7 +512,7 @@ def cmd_tag(buf):
             n = int(pcr.terms[0])
             rrhelper = [plv.rr[n-1]]
         except:
-            s = '.'+pcr.terms[0]+';/tag '+pcr.terms[1]+';/goto '+str(plv.rptr)
+            s = '.'+pcr.terms[0]+';/tag "'+pcr.terms[1]+'";/goto '+str(plv.rptr)
             addMacro(s)
             return
 #            rrhelper = plv.rr
@@ -1350,6 +1350,18 @@ def grabInput(cq):
         print shellString+x
     return x
 
+def tag_complete(text, state):
+    if text == '/':
+        l = plv.cmdCompletionList
+    else:
+        l = plv.tagCompletionList
+    for cmd in l:
+        if cmd.startswith(text):
+            if not state:
+                return cmd
+            else:
+                state -= 1
+
 def main():
     os.system('echo "\033]0;= PLAYLISTMAKER =\007"')
     if not checkLock():
@@ -1381,6 +1393,9 @@ def main():
     fillTagAliases()
     readDirs()
     readLocalSongs()
+    readline.parse_and_bind("bind ^I rl_complete")
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(tag_complete)
     
     if plv.MENU_AVAILABLE:
         import menu
@@ -1418,6 +1433,10 @@ def main():
             plv.rr = readRes()
             print ''
         plv.lenrr = len(plv.rr)
+        if plv.tagCompletionList == [] or plv.invalidateAllTags:
+            plv.tagCompletionList = [x for x in Tag.tagsByName]
+        if plv.cmdCompletionList == []:
+            plv.cmdCompletionList = map(lambda x: '/'+x.name, plv.commandlist)
         x = grabInput(plv.cmdQueue)
         #disable lowercasing for these commands
         b = False

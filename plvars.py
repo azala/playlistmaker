@@ -97,7 +97,9 @@ songs = []
 songDict = {'fn':{},
             'sk':{},}
 tags = []
-tagsByName = {}
+#tagsByName = {}
+tagCompletionList = [] #basically all the tagnames
+cmdCompletionList = []
 #tag_aliases = {}
 fileNames2sortKeys = {}
 sortKeys2fileNames = {}
