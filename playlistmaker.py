@@ -1351,7 +1351,7 @@ def grabInput(cq):
     return x
 
 def tag_complete(text, state):
-    if text == '/':
+    if text.startswith('/'):
         l = plv.cmdCompletionList
     else:
         l = plv.tagCompletionList
