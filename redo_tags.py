@@ -69,9 +69,6 @@ for ratingLine in h:
     short = unorm(pt[0].rpartition(plv.cSep)[2].lower())
     if short not in kmdict:
         print short
-        for k in kmdict:
-            if '16 slasher' in k:
-                print k
     dst.append(kmdict[short][0]+'\t'+pt[2])
 dst = map(unorm, dst)
 fwrite(unclean(dst), plv.ratingFile)

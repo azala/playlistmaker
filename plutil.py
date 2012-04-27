@@ -296,7 +296,8 @@ def ratingToString(r):
         return ratingString(r)
     
 def callDirfill():
-    subprocess.Popen(['python', 'dirfill.py'])
+#    subprocess.Popen(['python', 'dirfill.py'])
+    os.system('~/pystuff/playlistmaker/dirfill.py -a -nr')
     
 def doesGenreFolderExist(s):
     p = opj(plv.GENRESPLITPATH, s)

@@ -95,7 +95,8 @@ def main():
         init()
     recurlist(plv.LOCALSONGSPATH, basicInfo=True)
     writeSongLines(plv.localDirfillFile, mode)
-    os.system('python '+plv.PLMAKERDIR+'/redo_tags.py '+' '.join(sys.argv[1:]))
+    if '-nr' not in sys.argv:
+        os.system('python '+plv.PLMAKERDIR+'/redo_tags.py '+' '.join(sys.argv[1:]))
     waitAtEnd()
 
 if __name__ == '__main__':

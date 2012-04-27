@@ -65,18 +65,17 @@ def moveFile(src, dst, banish = False):
     plv.songDict['sk'][dstKey] = song
     for tag in plv.tags:
         tag.data['songs'] = filter(lambda x: x != song, tag.data['songs'])
-        invalidate(tag)
+    invalidate()
     if banish:
         plv.lines.remove(song)
     print 'Moved "'+os.path.basename(src)+'" to "'+os.path.basename(dst)+'".'
     plv.needToCallDirfill = True
+    plv.ratingdataChanged = True
     
 def banishFile(fn):
     moveFile(fn, plv.DONTWANTPATH, True)
     
 #---SEARCH RESULTS
-
-
 
 def newSearch(newResults, causedByThisSearch=''):
     plv.resultHistory = plv.resultHistory[-1*plv.maxStoredResults+1:] + [newResults]
@@ -293,6 +292,7 @@ def writetags():
         return
     if plv.needToCallDirfill:
         callDirfill()
+        plv.needToCallDirfill = False
     #----write tagfile
     tf = open(plv.tagfile, 'wb')
     for song in plv.songs:
@@ -674,6 +674,12 @@ def cmd_rn(buf):
         del Tag.tagsByName[src]
         print 'Renamed tag.'
 
+def moveConvertSrcDst(src, shortDstElement):
+    tempDir = os.path.dirname(src) + plv.cSep
+    tempExt = src[src.rfind('.'):]
+    dst = tempDir + shortDstElement + tempExt
+    return dst
+
 def cmd_move(buf):
     if plv.lenrr != 1:
         print 'You need exactly 1 element in the results list to move.'
@@ -685,10 +691,15 @@ def cmd_move(buf):
         plv.continueFlag = True
         return
     src = plv.rr[0].data['fn']
-    tempDir = os.path.dirname(src) + plv.cSep
-    tempExt = src[src.rfind('.'):]
-    dst = tempDir + shortDst[0] + tempExt
+    dst = moveConvertSrcDst(src, shortDst[0])
     moveFile(src, dst)
+    for src in plv.rr[0].data['locals']:
+        dst = moveConvertSrcDst(src, shortDst[0])
+        try:
+            subprocess.check_call(['mv "'+src+'" "'+dst+'"'], shell=True)
+        except subprocess.CalledProcessError as e:
+            print 'Move failed: '+str(e)
+            return
 
 def fmove_helper(curResult, shortDst):
     src = curResult.data['fn']
