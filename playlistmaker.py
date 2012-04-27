@@ -54,8 +54,8 @@ def moveFile(src, dst, banish = False):
 #        print 'Move failed: '+str(e)
 #        return
     try:
-        subprocess.check_call(['mv',src,dst], shell=True)
-    except:
+        subprocess.check_call(['mv "'+src+'" "'+dst+'"'], shell=True)
+    except subprocess.CalledProcessError as e:
         print 'Move failed: '+str(e)
         return
     song = plv.songDict['fn'][src]
