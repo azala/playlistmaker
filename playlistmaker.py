@@ -512,10 +512,8 @@ def cmd_tag(buf):
             n = int(pcr.terms[0])
             rrhelper = [plv.rr[n-1]]
         except:
-            s = '.'+pcr.terms[0]+';/tag "'+pcr.terms[1]+'";/goto '+str(plv.rptr)
-            addMacro(s)
+            addMacro(genericSearchStringMacro(pcr.terms[0], 'tag', [pcr.terms[1]]))
             return
-#            rrhelper = plv.rr
     else:
         rrhelper = plv.rr
     tname = pcr.terms[l-1].lower()
@@ -715,7 +713,21 @@ def cmd_banish(buf):
     print 'Banished '+str(plv.lenrr)+' files.'
 
 def cmd_rm(buf):
-    tagName = getAlias(buf[0].lower())
+    
+    pcr = parseCmdHelper(buf[0])
+    l = len(pcr.terms)
+    if l == 2:
+        try:
+            n = int(pcr.terms[0])
+            rrhelper = [plv.rr[n-1]]
+        except:
+            addMacro(genericSearchStringMacro(pcr.terms[0], 'rm', [pcr.terms[1]]))
+            return
+    else:
+        rrhelper = plv.rr
+    tagName = getAlias(pcr.terms[l-1].lower())
+    
+#    tagName = getAlias(buf[0].lower())
     if tagName not in Tag.tagsByName:
         print 'Tag doesn\'t exist.'
     elif plv.rr == []:
@@ -724,7 +736,7 @@ def cmd_rm(buf):
         tag = Tag.tagsByName[tagName]
         invalidate(tag)
         ctr = 0
-        for song in plv.rr:
+        for song in rrhelper:
             if tag in song.data['tags']:
                 removeTagFromSong(tag, song)
                 ctr += 1
@@ -817,6 +829,9 @@ def cmd_check(buf):
     checkIfFilesExist(plv.lines)
 
 def cmd_new(buf):
+    if plv.NOIPODMODE:
+        print 'Need iPod to set newest songs.'
+        return
     try:
         n = int(buf[0])
     except ValueError:
@@ -824,6 +839,9 @@ def cmd_new(buf):
     addMacro('/kill newest -i;/newhelper '+str(n)+';/tag newest')
     
 def cmd_newhelper(buf):
+    if plv.NOIPODMODE:
+        print 'Need iPod to set newest songs.'
+        return
     try:
         n = int(buf[0])
     except ValueError:
@@ -856,7 +874,11 @@ def cmd_rating(buf):
             n = float(parsed[0])
             pickList = plv.rr
         else:
-            rrIndex = int(parsed[0])
+            try:
+                rrIndex = int(parsed[0])
+            except:
+                addMacro(genericSearchStringMacro(parsed[0], 'rating', parsed[1]))
+                return
             n = float(parsed[1])
             pickList = [plv.rr[rrIndex-1]]
     except:
@@ -1230,7 +1252,11 @@ def parseSelect(s, mini, maxi):
     return ret
 
 def wipePlaylists():
-    l = listdir(plv.ROOTDIR)
+    try:
+        l = listdir(plv.ROOTDIR)
+    except:
+        print 'Not wiping playlists (could not find iPod)'
+        return
     for fn in l:
         if fn.endswith(plv.plExt):
             os.system('rm "'+opj(plv.ROOTDIR,fn)+'"')

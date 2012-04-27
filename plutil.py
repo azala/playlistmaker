@@ -336,3 +336,7 @@ def unorm(s):
 def killVLC():
     os.system("kill `ps aux | grep /Applications/VLC.app/Contents/MacOS/VLC | awk '{print $2}'` "+plv.redirect_stderr)
     
+def genericSearchStringMacro(searchTerm, commandStr, args):
+    argsAsStr = '"' + '" "'.join(args) + '"'
+    s = '.'+searchTerm+';/'+commandStr+' '+argsAsStr+';/goto '+str(plv.rptr)
+    return s
