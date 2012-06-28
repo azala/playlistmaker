@@ -54,7 +54,7 @@ redirect_stderr = '2> /dev/null'
 
 #notepad = 'notepad++'
 notepad = 'open -e'
-extns = ['mp3','wav','aac','ogg','flac','wma','m4a']
+extns = ['mp3','wav','aac','ogg','flac','wma','m4a','mid']
 excludedirs = [opj(ROOTDIR, '.Trashes'),
                DONTWANTPATH,
                opj(GENRESPLITPATH, 'other'),

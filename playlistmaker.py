@@ -629,7 +629,7 @@ def burn_options(optionlist, s):
 def cmd_dir(buf):
     optionlist = ['--local','-l']
     parsed, optionlist = parseCmdWithOptions(buf[0], optionlist)
-    uselocal = not plv.directorySearch and ('--local' in optionlist or '-l' in optionlist)
+    uselocal = not plv.directorySearch and ('--local' in optionlist or '-l' in optionlist or plv.NOIPODMODE)
     if uselocal:
         print 'Using a local copy.'
     if plv.lenrr < 1:
