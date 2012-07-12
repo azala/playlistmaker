@@ -1156,6 +1156,9 @@ def parseCmdHelper(s, *flags):
     slashed = False
     negated = False
     inAssignment = False
+    # enable negation only when at the start of a string or
+    # when preceded by a space
+    enableNegation = False 
     term = ''
     curAssignment = ''
     pcr = ParseCmdResult()
@@ -1183,8 +1186,9 @@ def parseCmdHelper(s, *flags):
                 term = ''
                 negated = False
                 inAssignment = False
+                enableNegation = True
         elif c == '-':
-            if inQuote:
+            if inQuote or not enableNegation:
                 term += c
             else:
                 negated = True
@@ -1194,6 +1198,8 @@ def parseCmdHelper(s, *flags):
             inAssignment = True
         else:
             term += c
+        if c != ' ':
+            enableNegation = False
     if inQuote:
         print 'You missed an endquote, so I put it in. :('
     if term != '':
