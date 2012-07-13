@@ -681,6 +681,10 @@ def moveConvertSrcDst(src, shortDstElement):
     return dst
 
 def cmd_move(buf):
+    if plv.NOIPODMODE:
+        print 'Need iPod to move.'
+        plv.continueFlag = True
+        return
     if plv.lenrr != 1:
         print 'You need exactly 1 element in the results list to move.'
         plv.continueFlag = True
@@ -1158,7 +1162,7 @@ def parseCmdHelper(s, *flags):
     inAssignment = False
     # enable negation only when at the start of a string or
     # when preceded by a space
-    enableNegation = False 
+    enableNegation = True 
     term = ''
     curAssignment = ''
     pcr = ParseCmdResult()
