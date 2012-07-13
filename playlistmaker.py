@@ -169,7 +169,7 @@ def doBackup(buf = ['']):
         params = parseCmd(buf)
     except:
         print 'Invalid input.'
-    doE = '-doe' in params
+    doE = '-a' in params
     filelist = filter(lambda x: x.endswith('.txt'), listdir(plv.CDATAPATH))
     curTime = dateTimeStr(time.gmtime())
     fdir = opj(mainBackupDir(), curTime)
@@ -1455,7 +1455,7 @@ def main():
     
     if not plv.NOIPODMODE and needAutoBackup():
         print 'Doing autobackup.'
-        doBackup(['-doe'])
+        doBackup(['-a'])
     else:
         if plv.NOIPODMODE:
             print 'No IPOD found, skipping backup. (!!!)'
