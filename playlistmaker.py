@@ -503,16 +503,19 @@ def doTag(tname, songs):
             plv.tags.append(t)
     print 'Applied tag to '+str(ctr)+' items.'
 
+def cmd_t(buf):
+    cmd_tag(buf)
+
 def cmd_tag(buf):
     plv.lastCmdWasSearch = False
     pcr = parseCmdHelper(buf[0])
     l = len(pcr.terms)
-    if l == 2:
+    if l >= 2:
         try:
             n = int(pcr.terms[0])
             rrhelper = [plv.rr[n-1]]
         except:
-            addMacro(genericSearchStringMacro(pcr.terms[0], 'tag', [pcr.terms[1]]))
+            addMacro(genericSearchStringMacro(" ".join(pcr.terms[0:-1]), 'tag', [pcr.terms[-1]]))
             return
     else:
         rrhelper = plv.rr
@@ -875,6 +878,9 @@ def cmd_newhelper(buf):
 def cmd_tap(buf):
     addMacro('/rating -f 1')
 
+def cmd_r(buf):
+    cmd_rating(buf)
+    
 def cmd_rating(buf):
     #floor option
     floorFlag = False
@@ -892,9 +898,9 @@ def cmd_rating(buf):
             try:
                 rrIndex = int(parsed[0])
             except:
-                addMacro(genericSearchStringMacro(parsed[0], 'rating', parsed[1]))
+                addMacro(genericSearchStringMacro(" ".join(parsed[0:-1]), 'rating', parsed[-1]))
                 return
-            n = float(parsed[1])
+            n = float(parsed[-1])
             pickList = [plv.rr[rrIndex-1]]
     except:
         print 'Invalid input.'

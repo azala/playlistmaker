@@ -30,20 +30,22 @@ over: <n> show all files with rating >= n
 p: play results or <playlist> play this playlist or <number> play this index of results
 q
 pp: same as /p 1
+r: shortcut for rating
 rating: <n> set results' ratings to n
 ratings: shows results' ratings
 rm: <name> remove tag from results
 rn: <a> <b> rename tag a to b
 same: apply last tag
 save: <name> saves last-played results to a file
-show
-s
-sl
+show: <tag> show all files with tag
+s: shortcut for show
+sl: show session search history
 sys: <stuff> execute bash command
+t: shortcut for tag
 tag: <name> apply tag to results
 tags: show each result's tags
 tap: rating floor 1
 this: show results
-time
+time: <a> <?b> shows files modified between a and b days ago
 wipe: delete all playlist files
 w: save all operations
