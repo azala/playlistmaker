@@ -575,6 +575,12 @@ def cmd_p(buf):
         quickFlag = True
         bufSplit.remove('--quick')
         buf[0] = ' '.join(bufSplit)
+    addFlag = False
+    if '--add' in bufSplit:
+        print 'Addflag!'
+        addFlag = True
+        bufSplit.remove('--add')
+        buf[0] = ' '.join(bufSplit)
     playAll = (len(buf[0]) == 0 or nosortFlag)
     try:
         if playAll:
@@ -587,7 +593,10 @@ def cmd_p(buf):
                 tag = None
             if tag != None:
                 if not quickFlag:
-                    addMacro('/show '+buf[0]+';/p')
+                    s = '/show '+buf[0]+';/p'
+                    if addFlag:
+                        s += ' --add'
+                    addMacro(s)
                 else:
                     playPlaylist(opj(plv.ROOTDIR, plv.tagToPlaylist[tname]), plv.itunes_flag)
                 plv.continueFlag = True
@@ -599,7 +608,7 @@ def cmd_p(buf):
         plv.continueFlag = True
         return
     if playAll and plv.lenrr > 0 and not plv.directorySearch:
-        if playSongs(plv.rr, not nosortFlag, plv.itunes_flag):
+        if playSongs(plv.rr, {'sort' : not nosortFlag, 'itunesFlag' : plv.itunes_flag, 'addFlag' : addFlag}):
             print 'Playing files.'
         else:
             print 'Could not play files.'
@@ -608,7 +617,7 @@ def cmd_p(buf):
             addMacro('/ds;/cfds on;"'+plv.rr[num].data['fn']+'";/cfds off;/p --nosort')
             plv.continueFlag = True
             return
-        if playSong(plv.rr[num], not nosortFlag, plv.itunes_flag):
+        if playSong(plv.rr[num], {'sort' : not nosortFlag, 'itunesFlag' : plv.itunes_flag, 'addFlag' : addFlag}):
             print 'Playing file '+plv.rr[num].data['fn']
         else:
             print 'Could not play file.'

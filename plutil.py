@@ -231,7 +231,9 @@ def playPlaylist(fn, itunesFlag):
         mp = plv.mediaplayer
     subprocess.Popen(mp.split(' ')+[fn])    
     
-def playSongs(inputSongs, sort, itunesFlag):
+def playSongs(inputSongs, optdict):
+    sort = optdict['sort']
+    itunesFlag = optdict['itunesFlag']
     try:
         if plv.NOIPODMODE:
             print 'Only playing local songs.'
@@ -240,7 +242,10 @@ def playSongs(inputSongs, sort, itunesFlag):
             songs = inputSongs
         localCtr = writePls(plv.LASTPLSPATH, songs, sort, localFlag=True)
         print str(localCtr)+' local files used. (%.0f%%)' % ((localCtr*100)/float(len(songs)))
-        killVLC()
+        if not ('addFlag' in optdict and optdict['addFlag']):
+            killVLC()
+        else:
+            print 'Foo!'
         if itunesFlag:
             mp = plv.second_mediaplayer
         else:
@@ -258,8 +263,8 @@ def playSongs(inputSongs, sort, itunesFlag):
     except:
         return False
 
-def playSong(fn, sort, itunesFlag):
-    return playSongs([fn], sort, itunesFlag)
+def playSong(fn, optdict):
+    return playSongs([fn], optdict)
 
 def addMacro(s):
     plv.cmdQueue = doubleSlash(s).split(';') + plv.cmdQueue
