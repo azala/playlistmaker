@@ -4,3 +4,4 @@ cd ~/pystuff/playlistmaker
 ./dirfill.py -a
 echo "/new;//" > $PLAYLISTMAKER_DIR/data/preprocess.txt
 ./playlistmaker.py
+rm $PLAYLISTMAKER_DIR/data/preprocess.txt
