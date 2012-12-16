@@ -712,7 +712,7 @@ def cmd_art(buf):
     srcSplit = os.path.split(src)
 #    dst = os.path.join(srcSplit[0], artistL[1] + ' - ' + srcSplit[1])
     dst = artistL[1] + ' - ' + srcSplit[1].rsplit('.')[0]
-    addMacro(','+artistL[0]+';/move "'+dst+'"')
+    addMacro(','+artistL[0]+';/move "'+dst+'";/goto '+str(plv.rptr))
 
 def cmd_move(buf):
     if plv.NOIPODMODE:
