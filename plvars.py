@@ -61,7 +61,7 @@ excludedirs = [opj(ROOTDIR, '.Trashes'),
                opj(ROOTDIR, '.rockbox'),
                MOVEDPATH,
                IPODBACKUPDIR]
-no_lowercase_conversion_commands = ['move','sys','msg']
+no_lowercase_conversion_commands = ['move','sys','msg','art']
 FUNC_PREFIX = 'cmd_'
 AUTOBACKUP_INTERVAL = 3 #days after last backup before automatically making another
 VLCSOCK_DELAY = 0.2 #sleep time between the call to open vlc and the call to play

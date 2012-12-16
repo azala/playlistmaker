@@ -1,5 +1,6 @@
 alias: <s1> <s2> tag <s1> can be referenced by an alternate name <s2>.
 automp: sets mp = /over 5 and np = /over 1
+art
 at: auto-tag feature (new!)
 back: <n> go back n searches
 backup: make backups of important files

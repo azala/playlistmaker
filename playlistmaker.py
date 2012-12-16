@@ -695,6 +695,25 @@ def moveConvertSrcDst(src, shortDstElement):
     dst = tempDir + shortDstElement + tempExt
     return dst
 
+def cmd_art(buf):
+    artistL = parseCmd(buf[0])
+    if len(artistL) != 2:
+        print 'You need exactly 2 arguments (index, artist) to move.'
+        plv.continueFlag = True
+        return
+    try:
+        index = int(artistL[0])-1
+        if index < 0 or index >= plv.lenrr:
+            raise
+    except:
+        print 'Bad index.'
+        return
+    src = plv.rr[index].data['fn']
+    srcSplit = os.path.split(src)
+#    dst = os.path.join(srcSplit[0], artistL[1] + ' - ' + srcSplit[1])
+    dst = artistL[1] + ' - ' + srcSplit[1].rsplit('.')[0]
+    addMacro(','+artistL[0]+';/move "'+dst+'"')
+
 def cmd_move(buf):
     if plv.NOIPODMODE:
         print 'Need iPod to move.'
