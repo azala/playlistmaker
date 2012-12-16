@@ -695,18 +695,25 @@ def moveConvertSrcDst(src, shortDstElement):
     dst = tempDir + shortDstElement + tempExt
     return dst
 
+#s is a string representing a number
+def getResultIndex(s):
+    try:
+        index = int(s)-1
+        if index < 0 or index >= plv.lenrr:
+            raise
+        return index
+    except:
+        print 'Bad index.'
+        return None
+
 def cmd_art(buf):
     artistL = parseCmd(buf[0])
     if len(artistL) != 2:
         print 'You need exactly 2 arguments (index, artist) to move.'
         plv.continueFlag = True
         return
-    try:
-        index = int(artistL[0])-1
-        if index < 0 or index >= plv.lenrr:
-            raise
-    except:
-        print 'Bad index.'
+    index = getResultIndex(artistL[0])
+    if index == None:
         return
     src = plv.rr[index].data['fn']
     srcSplit = os.path.split(src)
@@ -719,20 +726,19 @@ def cmd_move(buf):
         print 'Need iPod to move.'
         plv.continueFlag = True
         return
-    if plv.lenrr != 1:
-        print 'You need exactly 1 element in the results list to move.'
-        plv.continueFlag = True
-        return
     shortDst = parseCmd(buf[0])
-    if len(shortDst) != 1:
-        print 'You need exactly 1 argument (destination file) to move.'
+    if len(shortDst) != 2:
+        print 'You need exactly 2 arguments (index, destination) to move.'
         plv.continueFlag = True
         return
-    src = plv.rr[0].data['fn']
-    dst = moveConvertSrcDst(src, shortDst[0])
+    index = getResultIndex(shortDst[0])
+    if index == None:
+        return
+    src = plv.rr[index].data['fn']
+    dst = moveConvertSrcDst(src, shortDst[1])
     moveFile(src, dst)
-    for src in plv.rr[0].data['locals']:
-        dst = moveConvertSrcDst(src, shortDst[0])
+    for src in plv.rr[index].data['locals']:
+        dst = moveConvertSrcDst(src, shortDst[1])
         try:
             subprocess.check_call(['mv "'+src+'" "'+dst+'"'], shell=True)
         except subprocess.CalledProcessError as e:
