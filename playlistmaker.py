@@ -468,7 +468,10 @@ def cmd_cache(buf):
             print s
             os.system(s)
     print 'Done.'
-    
+
+def cmd_dsp(buf):
+    addMacro('/ds '+buf[0]+';/p 1')
+
 #assuming a string (not Tag object) and a list of Song objects are passed in.
 def doTag(tname, songs):
     tname = getAlias(tname)
