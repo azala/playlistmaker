@@ -8,7 +8,7 @@ plExt = '.m3u8'
 cSep = '/'
 cEncoding = 'NFC'
 
-PLMAKERDIR = os.path.expanduser('~/pystuff/playlistmaker')
+PLMAKERDIR = os.environ['PLAYLISTMAKER_DIR']
 CDATAPATH = opj(PLMAKERDIR,'data')
 ROOTDIR = '/Volumes/IPOD'
 
