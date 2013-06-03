@@ -568,7 +568,14 @@ def cmd_ds(buf):
     plv.directorySearch = not plv.directorySearch
 
 def cmd_pp(buf):
-    addMacro(buf[0]+';/p 1')
+    opt = ''
+    bufSplit = buf[0].split(' ')
+    if '--add' in bufSplit:
+        addFlag = True
+        bufSplit.remove('--add')
+        buf[0] = ' '.join(bufSplit)
+        opt = ' --add'
+    addMacro(buf[0]+';/p 1'+opt)
     
 def cmd_p(buf):
     nosortFlag = (buf[0] == '--nosort')
@@ -580,7 +587,6 @@ def cmd_p(buf):
         buf[0] = ' '.join(bufSplit)
     addFlag = False
     if '--add' in bufSplit:
-        print 'Addflag!'
         addFlag = True
         bufSplit.remove('--add')
         buf[0] = ' '.join(bufSplit)

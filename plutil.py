@@ -245,7 +245,7 @@ def playSongs(inputSongs, optdict):
         if not ('addFlag' in optdict and optdict['addFlag']):
             killVLC()
         else:
-            print 'Foo!'
+            print 'Not killing VLC.'
         if itunesFlag:
             mp = plv.second_mediaplayer
         else:
