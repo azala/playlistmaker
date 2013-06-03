@@ -4,7 +4,7 @@ art
 at: auto-tag feature (new!)
 back: <n> go back n searches
 backup: make backups of important files
-banish
+banish: sends all files in last result to "don't want" directory
 cache
 check: show files in dirfill that don't exist
 cfds

@@ -42,11 +42,12 @@ def standard_rename_op(s):
     return ret
         
 def convert(s):
-    if not s.endswith(".mp3"):
+    if not s.lower().endswith(".mp3"):
         return False
+    ss = s[:-3]+'mp3'
     if annihilateDotUnderscore(s):
         return False
-    split = os.path.split(s)
+    split = os.path.split(ss)
     fn = split[1]
     for c in CHAR_REPLACE_DIR:
         fn = fn.replace(c, CHAR_REPLACE_DIR[c])

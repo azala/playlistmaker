@@ -261,7 +261,7 @@ def readtags():
             else:
                 curSong.data['tags'].append(t)
             if curSong in t.data['songs']:
-                print '  Duplicate song: '+song.data['name']
+                print '  Duplicate song: '+curSong.data['fn']
                 invalidate()
             else:
                 t.data['songs'].append(curSong)
