@@ -382,7 +382,7 @@ def doTheCommand(x, cmdShortString, lbuf = [None]):
     return b
 
 def cmd_automp(buf):
-    s = '/kill na -i;-"'+plv.ALBUMPATH+';/tag na";/kill mp -i;/over 6;/tag mp;/kill np -i;/over 1;/tag np'
+    s = '/kill na -i;-"'+plv.ALBUMPATH+'";/tag na";/kill mp -i;/over 6;/tag mp;/kill np -i;/over 1;/tag np'
     for t in [50, 100, 365]:
         s += ';/kill tminus'+str(t)+' -i;/time '+str(t)+' -np;/tag tminus'+str(t)
     addMacro(s)
