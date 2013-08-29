@@ -3,6 +3,7 @@
 *.ini
 *.bat
 *.pyc
+*.m3u
 *.m3u8
 old/*
 !*/commandlist.txt
